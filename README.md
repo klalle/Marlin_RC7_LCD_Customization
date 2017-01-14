@@ -24,12 +24,12 @@ And this is my custom menu that I ended up with: <br>
 Startscreen
 - Back
 - Move Axis
-..- 0.1mm (Z,X,Y)
-..-1mm (Z,X,Y)
-..-10mm (X,Y)
+⋅⋅- 0.1mm (Z,X,Y)
+⋅⋅-1mm (Z,X,Y)
+⋅⋅-10mm (X,Y)
 -Probe for Z0
-..-Zero only Z
-..-Zero All
+⋅⋅-Zero only Z
+⋅⋅-Zero All
 -Print from SD
 -Go To Home (All/X/Y/Z)
 -Disable steppers
@@ -39,4 +39,4 @@ Startscreen
 -Store to EEPROM
 -LOAD from EEPROM
 -Control
-..-acceleration, jerk, speeds.....
+⋅⋅-acceleration, jerk, speeds.....
