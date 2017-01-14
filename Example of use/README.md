@@ -52,6 +52,8 @@ This is a toy I made for my 10 months old son Emil:
     * Speed: 10 mm/s
 	* 1.5 mm passes
 
+Make sure you put <b>all</b> the gcode-files on the same SD-card before you start (the system reboots everytime you swap cards => lose track of X and Y...)
+
 And voila: 
 
 ![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/Pics/Remote_Front.jpg "Remote_Front")
