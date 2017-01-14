@@ -1,7 +1,7 @@
 # Marlin_RC7_LCD_Customization for MPCNC-router
 This is a customization of the LCD-menu that's in the Marlin version that's configured to work with an MPCNC from [vicious1.com](http://www.vicious1.com/)<br>
-The project version used is the: "RC7_MPCNC_LCD_9916" downloaded from the ["Firmware"-page](http://www.vicious1.com/marlin-firmware/)<br>
-[Direct link to prohect file](http://www.vicious1.com/wp-content/uploads/2015/12/RC7_MPCNC_LCD_9916.zip)
+The project version used is the: "RC7_MPCNC_LCD_9916" downloaded from the [Firmware-page](http://www.vicious1.com/marlin-firmware/)<br><br>
+[Direct link to project file](http://www.vicious1.com/wp-content/uploads/2015/12/RC7_MPCNC_LCD_9916.zip)
 
 I was going crazy when trying to access the menu objects I needed through the LCD, so I came up with a couple of improvements that customized the menu for me.
 
