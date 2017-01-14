@@ -13,8 +13,8 @@ This is what I aimed for:<br>
 * Access the z-probe offset from the LCD-menu
   * The height of the piece of metal I let the tool go down against to probe for z (connected to GND and z-min)
 * Make a temporary Z-offset-menu item
-  * Useful if e.g. an engraving ends up too shallow – just make a temporary z-offset of -0.5 mm and run the same file again (it doesn’t lose x and y)
-  * So that you don’t have to alter the z-probe offset
+  * Useful if e.g. an engraving ends up too shallow – just make a temporary z-offset of -0.5 mm and run the same file again (make sure to not lose X and Y!!)
+  * So that you don’t have to alter the z-probe offset all the time (the probe is most likely the same one...!)
 * “Go to home” command in menu
 * Set current position to home (without offset) menu item
 * Make the 2nd option on a submenu pre-selected
