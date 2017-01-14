@@ -7,8 +7,8 @@ here's a [direct link](http://www.vicious1.com/wp-content/uploads/2016/12/MPCNC_
 
 This is a toy I made for my 10 months old sun Emil: 
 
-![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/Remote_CAD.PNG "Remote_CAD")
-![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/Remote_CAM.PNG "Remote_CAM")
+![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/Pics/Remote_CAD.PNG "Remote_CAD")
+![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/Pics/Remote_CAM.PNG "Remote_CAM")
 
 ###The remote is routed in 7 steps, and this is how I used the menu:
 <b>1. <b>Define the Z-probe bottom thikness:</b>
@@ -54,8 +54,8 @@ This is a toy I made for my 10 months old sun Emil:
 
 And voila: 
 
-![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/Remote_Front.jpg "Remote_Front")
+![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/Pics/Remote_Front.jpg "Remote_Front")
 
-![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/Remote_Back.jpg "Remote_Back")
+![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/Pics/Remote_Back.jpg "Remote_Back")
 
-![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/Remote_Done.jpg "Remote_Done")
+![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/Pics/Remote_Done.jpg "Remote_Done")
