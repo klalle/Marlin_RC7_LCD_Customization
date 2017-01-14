@@ -11,10 +11,12 @@
 
 5. Compile and upload the Marlin firmware in the Arduino IDE to your Arduino/Ramps-board!
 
-And you're done!
+###And you're done!
 
 
 If you want, you can always change back to the original version by uploading that one, or customize it yourselves to suit your needs...
+
+All changes I've made are marked with //Kalle - open it up in Notepad++ and do a search!
 
 All menu-changes are done in "Marlin/ultralcd.cpp"
 
