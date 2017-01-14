@@ -13,7 +13,7 @@ This is a toy I made for my 10 months old son Emil:
 ###The remote is routed in 7 steps, and this is how I used the menu:
   1. <b>Define the Z-probe bottom thikness:</b>
   1. <b>Z homing offset</b> = 1.24 mm
-  2. Store to EEPROM - To save the Z homing offset to eeprom so that <b>step one never has to be entered again!
+  2. Store to EEPROM - To save the Z homing offset to eeprom so that <b>step one never has to be entered again!</b>
 
 <b>2. Define X0, Y0, Z0 (Home)</b>
   1. Manually set machine where you want X0,Y0 (with “move axis” from menu, or by hand)
