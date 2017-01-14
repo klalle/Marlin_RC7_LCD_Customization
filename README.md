@@ -1,13 +1,13 @@
 # Marlin_RC7_LCD_Customization for MPCNC-router
-This is a customization of the LCD-menu that's in the project "RC7_MPCNC_LCD_9916" from:<br>
-http://www.vicious1.com/marlin-firmware/ 
-
-the code is downloaded from: "Use this one for now- Marlin RC7 MPCNC w/LCD" which directs to: <br>
+This is a customization of the LCD-menu that's in the Marlin version that's configured to work with an MPCNC from http://www.vicious1.com/<br>
+The project version used is the: "RC7_MPCNC_LCD_9916" downloaded from:<br>
+http://www.vicious1.com/marlin-firmware/ <br>
+Direct link: <br>
 http://www.vicious1.com/wp-content/uploads/2015/12/RC7_MPCNC_LCD_9916.zip
 
 I was going crazy when trying to access the menu objects I needed through the LCD, so I came up with a couple of improvements that customized the menu for me.
 
-This is what I aimed for:<br>
+####This is what I aimed for:<br>
 * Get rid of all junk I don’t use (I’m only using the machine as a CNC-router)
 * Reorder the menu to put the mostly used commands on top
 * Access the z-probe offset from the LCD-menu
@@ -20,7 +20,7 @@ This is what I aimed for:<br>
 * Make the 2nd option on a submenu pre-selected
   * If I e.g. enter the submenu “Move Axis” from the “Prep-menu”– most likely my next action won’t be to go back to the prep-menu, but to press the first real option (2nd option) 
 
-And this is my custom menu that I ended up with: <br>
+####And this is my custom menu that I ended up with: <br>
 * Startscreen
   * Back
   * Move Axis
