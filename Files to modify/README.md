@@ -7,7 +7,7 @@
 
 3. Unzip the "RC7_MPCNC_LCD_9916.zip"
 
-4. Downoad the modified files from this directory and replace the originial files in the RC7_MPCNC_LCD_9916 with them.
+4. Downoad the modified files from the "Marlin"-directory and replace the originial files in the RC7_MPCNC_LCD_9916 with them.
 
 5. Compile and upload the Marlin firmware in the Arduino IDE to your Arduino/Ramps-board!
 
