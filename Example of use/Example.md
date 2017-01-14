@@ -1,6 +1,8 @@
 # Wooden Remote control
 
 This is a toy I made for my 10months old sun Emil: 
+![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/2017-01-13%2010.15.46.jpg "Remote")
+![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/2017-01-11%2023.24.06.jpg "Remote")
 
 ###This is how I used the menu:
 1. Define the Z-probe bottom thikness:
