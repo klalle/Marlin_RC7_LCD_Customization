@@ -5,7 +5,7 @@
 The Cad file and the CAM was all done in Fusion 360 (free for entusiasts!) and I used a post processor downloaded from the [forum of Vicious.com](http://www.vicious1.com/forum/topic/fusion-360/page/6/)
 here's a [direct link](http://www.vicious1.com/wp-content/uploads/2016/12/MPCNC_Fusion360_V9_SDcard.zip)
 
-This is a toy I made for my 10 months old sun Emil: 
+This is a toy I made for my 10 months old son Emil: 
 
 ![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/Pics/Remote_CAD.PNG "Remote_CAD")
 ![alt text](https://github.com/klalle/Marlin_RC7_LCD_Customization/blob/master/Example%20of%20use/Pics/Remote_CAM.PNG "Remote_CAM")
