@@ -150,6 +150,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
   // Different types of actions that can be used in menu items.
   static void menu_action_back();
   static void menu_action_submenu(screenFunc_t data);
+  static void menu_action_submenu2(screenFunc_t data); //Kalle - selects first actual menu-item instead of top item "Back" when entering submenu
   static void menu_action_gcode(const char* pgcode);
   static void menu_action_function(screenFunc_t data);
   static void menu_action_setting_edit_bool(const char* pstr, bool* ptr);
@@ -183,7 +184,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
     #define ENCODER_FEEDRATE_DEADZONE 10
   #endif
   #ifndef ENCODER_STEPS_PER_MENU_ITEM
-    #define ENCODER_STEPS_PER_MENU_ITEM 5
+    #define ENCODER_STEPS_PER_MENU_ITEM 4 //Kalle 1 whole step on knob = 4 encoder steps
   #endif
   #ifndef ENCODER_PULSES_PER_STEP
     #define ENCODER_PULSES_PER_STEP 1
@@ -213,7 +214,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
   #define SCREEN_OR_MENU_LOOP() \
     int8_t _menuLineNr = encoderTopLine, _thisItemNr; \
     for (int8_t _lcdLineNr = 0; _lcdLineNr < LCD_HEIGHT; _lcdLineNr++, _menuLineNr++) { \
-      _thisItemNr = 0
+      _thisItemNr = 0;
 
   /**
    * START_SCREEN  Opening code for a screen having only static items.
@@ -238,7 +239,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
     bool wasClicked = LCD_CLICKED; \
     bool _skipStatic = true; \
     SCREEN_OR_MENU_LOOP()
-
+      //encoderLine++; //funka inte
   /**
    * MENU_ITEM generates draw & handler code for a menu item, potentially calling:
    *
@@ -260,6 +261,11 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
    *     menu_action_setting_edit_int3(PSTR(MSG_SPEED), &feedrate_percentage, 10, 999)
    *
    */
+   
+   //Needs to define the function -usually defined in ultralcd_impl_DOGM.h or ultralcd_impl_HD44780 but moved here to only have to edit one file //Kalle
+   #define lcd_implementation_drawmenu_submenu2(sel, row, pstr, data) lcd_implementation_drawmenu_generic(sel, row, pstr, '>', LCD_STR_ARROW_RIGHT[0]) //Kalle 
+   
+   
   #define _MENU_ITEM_PART_1(TYPE, LABEL, ARGS...) \
     if (_menuLineNr == _thisItemNr) { \
       if (lcdDrawUpdate) \
@@ -373,7 +379,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
     if (currentScreen != screen) {
       currentScreen = screen;
       lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW;
-      encoderPosition = encoder;
+    encoderPosition = encoder;
       if (feedback) lcd_quick_feedback();
       if (screen == lcd_status_screen) {
         defer_return_to_status = false;
@@ -484,7 +490,9 @@ static void lcd_status_screen() {
     }
 
     if (current_click) {
-      lcd_goto_screen(lcd_main_menu, true);
+      //lcd_goto_screen(lcd_main_menu, true); //Kalle skips main menu - jump directly to customized prep-menu:
+    lcd_goto_screen(lcd_prepare_menu, true, ENCODER_STEPS_PER_MENU_ITEM); //Kalle
+    
       lcd_implementation_init( // to maybe revive the LCD if static electricity killed it.
         #if ENABLED(LCD_PROGRESS_BAR) && ENABLED(ULTIPANEL)
           currentScreen == lcd_status_screen
@@ -594,7 +602,7 @@ void kill_screen(const char* lcd_msg) {
         MENU_ITEM(submenu, MSG_DELTA_CALIBRATE, lcd_delta_calibrate_menu);
       #endif
     }
-    MENU_ITEM(submenu, MSG_CONTROL, lcd_control_menu);
+    
 
     #if ENABLED(SDSUPPORT)
       if (card.cardOK) {
@@ -619,7 +627,9 @@ void kill_screen(const char* lcd_msg) {
         #endif
       }
     #endif //SDSUPPORT
-
+  
+  MENU_ITEM(submenu, MSG_CONTROL, lcd_control_menu); 
+  
     #if ENABLED(LCD_INFO_MENU)
       MENU_ITEM(submenu, MSG_INFO_MENU, lcd_info_menu);
     #endif
@@ -637,8 +647,8 @@ void kill_screen(const char* lcd_msg) {
    * Set the home offset based on the current_position
    */
   void lcd_set_home_offsets() {
-    // M428 Command
-    enqueue_and_echo_commands_P(PSTR("M428"));
+    // M428 Command - Set home offsets based on the current position.
+    enqueue_and_echo_commands_P(PSTR("M428")); 
     lcd_return_to_status();
   }
 
@@ -1170,26 +1180,310 @@ void kill_screen(const char* lcd_msg) {
 
   /**
    *
-   * "Prepare" submenu
+   * "Home Z" submenus //custom function created by Kalle:
+   * Homes the z with a wire clipped to the tool connected to the z-min pin on ramps and a metal block of a sertain height connected to gnd (middle pin) (or vise versa)
+   * Remember to set the "Z Homing offset" to the height of the metal block first!
+   */
+   
+   
+  const char* HomeZText;
+  int lastEncPos = 0;
+  static void lcd_AutoHome_menu(bool All) {
+    
+    if (LCD_CLICKED) { 
+    if(HomeZText=="YES!"){
+        HomeZText = "CANCEL";
+        //Home Z
+        enqueue_and_echo_commands_P(PSTR("G28 Z"));
+    if(All){
+      //Zero x and y to current position!
+      enqueue_and_echo_commands_P(PSTR("G92 X0 Y0"));
+        }
+    //Move z up after homing
+    enqueue_and_echo_commands_P(PSTR("G1 F150 Z5"));
+         //Tell Marlin that we know where all axis are
+        axis_known_position[Z_AXIS] = true; //Otherwise they'll blink
+        axis_known_position[X_AXIS] = true;
+        axis_known_position[Y_AXIS] = true;
+        axis_homed[Z_AXIS] = true; //Otherwise they'll blink "?"
+        axis_homed[X_AXIS] = true;
+        axis_homed[Y_AXIS] = true;
+        
+        //Retur to status screen
+        lcd_return_to_status();
+      
+    }else{
+    
+      lcd_goto_previous_menu(); 
+    }
+    return; 
+    }
+    ENCODER_DIRECTION_NORMAL(); //trigger this submenu to update first time!
+  
+    if (encoderPosition>lastEncPos) { 
+      HomeZText = "YES!";
+    }else if (encoderPosition<lastEncPos){
+      HomeZText = "CANCEL";
+    }
+    lastEncPos = encoderPosition;
+    //encoderPosition=0;
+    lcd_implementation_drawedit(PSTR("Probe is connected"), HomeZText);
+      //if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR("Set probes and click!"), "");//ftostr41sign(home_offset[Z_AXIS]));
+  }
+  static void lcd_AutoHomeOnlyZ_menu() {
+  
+    lcd_AutoHome_menu(false);
+      
+  }
+  static void lcd_AutoHomeAll_menu() {
+    
+    //Zero x and y to current position!
+    //enqueue_and_echo_commands_P(PSTR("G92 X0 Y0"));
+  lcd_AutoHome_menu(true);
+    //lcd_AutoHomeOnlyZ_menu();
+      
+  }
+  
+  static void lcd_AutoHomeZ_menu() {
+  START_MENU();
+    //
+    // ^ Main
+    MENU_ITEM(back, MSG_MAIN);
+  
+  MENU_ITEM(submenu, "Zero only Z", lcd_AutoHomeOnlyZ_menu); 
+  MENU_ITEM(submenu, "Zero all", lcd_AutoHomeAll_menu); 
+  END_MENU();
+   }
+  
+    /**
    *
+   * "Set Z Probe height" submenu //custom function created by Kalle:
+   * Configure the thickness of the z-probe bottom part...
+   * Consider saving this to EEPROM to remember after restart!
+   */
+
+  static void lcd_setZProbeHeight_menu() {
+    if (LCD_CLICKED) { 
+    //Maybe I need to update the planner?
+    lcd_goto_previous_menu(true); 
+    return; 
+  }
+    ENCODER_DIRECTION_NORMAL();
+    if (encoderPosition) { 
+    refresh_cmd_timeout();
+  
+    //For each step on the knob /hole step = ENCODER_STEPS_PER_MENU_ITEM = 4
+    if(encoderPosition % 4 == 0 && home_offset[Z_AXIS] + float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM >= 0){ //Only allow positive offset
+       home_offset[Z_AXIS] += float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
+       current_position[Z_AXIS] += float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
+       encoderPosition = 0;       
+    }
+        
+    
+        lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
+    }
+    if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR("Offset [mm]"), ftostr32(home_offset[Z_AXIS]));//ftostr41sign(home_offset[Z_AXIS]));
+  }
+  
+   /**
+   *
+   * "Set Z Temp-offset" submenu //custom function created by Kalle:
+   * Configure a temporary offset (so you dont have to alter the z-probe offset)
+   * all this function does is tricking Marlin that the current_position[Z_AXIS]  is something else than it is...
+   */
+  float tempZOffset =0; //to keep track of the total temp offset!
+  
+    static void lcd_setZTempOffset_menu() {
+    if (LCD_CLICKED) { 
+    //The distance that XYZ has been offset by G92. Reset by G28.
+    position_shift[Z_AXIS] -= tempZOffset; // Offset the coordinate space
+    
+    //Update the planner with the acutal positions 
+    planner.set_position_mm(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
+    
+    lcd_goto_previous_menu(true); 
+    return; }
+    ENCODER_DIRECTION_NORMAL();
+    if (encoderPosition) {
+    refresh_cmd_timeout();
+    //For each step on the knob /hole step = 4
+    if(encoderPosition % ENCODER_STEPS_PER_MENU_ITEM == 0){
+      tempZOffset+= float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
+    
+      current_position[Z_AXIS] -= float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM; //call sync_plan_position soon after this.
+      encoderPosition = 0;
+    }
+    
+    
+    lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
+    }
+    if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR("Offset [mm]"), ftostr32(tempZOffset));//ftostr41sign(home_offset[Z_AXIS]));
+  }
+  /**
+   *
+   * "Home" submenu //custom function created by Kalle:
+   * 
+   * 
+   */
+   static void HomeAll() {
+    //Move z
+    enqueue_and_echo_commands_P(PSTR("G1 F300 Z0"));
+    //Move X,Y
+    enqueue_and_echo_commands_P(PSTR("G1 F2000 X0 Y0"));
+   
+   }
+  static void lcd_GoToHome_menu() {
+    START_MENU();
+    MENU_ITEM(back, MSG_MAIN);
+    
+    MENU_ITEM(function, "ALL", HomeAll); //All
+    MENU_ITEM(gcode, "X", PSTR("G1 F2000 X0"));
+    MENU_ITEM(gcode, "Y", PSTR("G1 F2000 Y0"));
+    MENU_ITEM(gcode, "Z", PSTR("G1 F300 Z0"));
+
+    END_MENU();
+  }
+  
+  /**
+   *
+   * "Prepare" submenu //Kalle this is totally customized to show the menu i want!
+   *
+   -Startscreen
+    -Back
+    -Move Axis
+      -0.1mm (Z,X,Y) 
+      -1mm (Z,X,Y)
+      -10mm (X,Y)
+    -Probe for Z0
+	  -Zero only Z
+	  -Zero All
+    -Print from SD
+    -Go To Home (All/X/Y/Z)
+    -Disable steppers
+    -Temp Z offset
+    -Z Homing offset 
+    -Make this home
+    -Store to EEPROM
+    -LOAD from EEPROM
+    -Control
+      -acceleration, jerk, speeds.....
+	  
+	  
+	  För att lägga igop PSTR: 
+	  void funktionsnamn(const char *name){
+		  char cmd[4 + strlen(name) + 1]; // Room for "M23 ", filename, and null
+		  sprintf_P(cmd, PSTR("M23 %s"), name);
+		  for (char *c = &cmd[4]; *c; c++) *c = tolower(*c);
+		  enqueue_and_echo_command(cmd); 
+		  //till skillnad från: enqueue_and_echo_commands_P(PSTR("M24"));
+	  }
    */
 
   static void lcd_prepare_menu() {
+  
     START_MENU();
-
     //
     // ^ Main
-    //
     MENU_ITEM(back, MSG_MAIN);
+  
+  //If something is still moving => show only Feedrate % and SD-card menu!
+  if (planner.movesplanned() || IS_SD_PRINTING) {
 
+    // Speed:
+    MENU_ITEM_EDIT(int3, MSG_SPEED, &feedrate_percentage, 10, 999);
+    
+    //SD-card:
+    #if ENABLED(SDSUPPORT)
+        if (card.cardOK) {
+		    if (card.isFileOpen()) {
+				if (card.sdprinting)
+					MENU_ITEM(function, MSG_PAUSE_PRINT, lcd_sdcard_pause);
+				else
+					MENU_ITEM(function, MSG_RESUME_PRINT, lcd_sdcard_resume);
+					MENU_ITEM(function, MSG_STOP_PRINT, lcd_sdcard_stop);
+		    }
+			else {
+				MENU_ITEM(submenu2, MSG_CARD_MENU, lcd_sdcard_menu);
+				#if !PIN_EXISTS(SD_DETECT)
+				MENU_ITEM(gcode, MSG_CNG_SDCARD, PSTR("M21"));  // SD-card changed by user
+				#endif
+			}
+	  }
+      else {
+		  MENU_ITEM(submenu2, MSG_NO_CARD, lcd_sdcard_menu);
+		  #if !PIN_EXISTS(SD_DETECT)
+			MENU_ITEM(gcode, MSG_INIT_SDCARD, PSTR("M21")); // Manually initialize the SD-card via user interface
+		  #endif
+      }
+    #endif //SDSUPPORT
+    }
+  else{ //The actual prepare menu
+    // Move Axis
+    MENU_ITEM(submenu2, MSG_MOVE_AXIS, lcd_move_menu);
+    
+    //Home Z (and set x&y=0)
+    MENU_ITEM(submenu2, "Probe for Z0", lcd_AutoHomeZ_menu); 
+    
+    //SD-card: 
+    #if ENABLED(SDSUPPORT)
+        if (card.cardOK) {
+		    if (card.isFileOpen()) {
+				if (card.sdprinting)
+					MENU_ITEM(function, MSG_PAUSE_PRINT, lcd_sdcard_pause);
+				else
+					MENU_ITEM(function, MSG_RESUME_PRINT, lcd_sdcard_resume);
+					MENU_ITEM(function, MSG_STOP_PRINT, lcd_sdcard_stop);
+		    }
+			else {
+				MENU_ITEM(submenu2, MSG_CARD_MENU, lcd_sdcard_menu);
+				#if !PIN_EXISTS(SD_DETECT)
+				MENU_ITEM(gcode, MSG_CNG_SDCARD, PSTR("M21"));  // SD-card changed by user
+				#endif
+			}
+	  }
+      else {
+		  MENU_ITEM(submenu2, MSG_NO_CARD, lcd_sdcard_menu);
+		  #if !PIN_EXISTS(SD_DETECT)
+			MENU_ITEM(gcode, MSG_INIT_SDCARD, PSTR("M21")); // Manually initialize the SD-card via user interface
+		  #endif
+      }
+    #endif //SDSUPPORT
+    
+    //Home-menu
+    MENU_ITEM(submenu2, "Go To Home", lcd_GoToHome_menu);
+    
+    // Disable Steppers
+    MENU_ITEM(gcode, MSG_DISABLE_STEPPERS, PSTR("M84"));
+    
+    //Set a temporary Z offset
+    MENU_ITEM(submenu, "Temp Z offset", lcd_setZTempOffset_menu);
+    
+    //Set Z-Homing offset (Height of probe bottom material) good idea to save to eeprom after this
+    MENU_ITEM(submenu, "Z homing offset", lcd_setZProbeHeight_menu);
+    
+    //Set current position to home
+    MENU_ITEM(gcode, "Make this home", PSTR("G92 X0 Y0 Z0"));
+    
+    #if ENABLED(EEPROM_SETTINGS)
+      MENU_ITEM(function, "Store to EEPROM", Config_StoreSettings); //MSG_STORE_EPROM
+      MENU_ITEM(function, "Load from EEPROM", Config_RetrieveSettings); //MSG_LOAD_EPROM
+    #endif
+    
+    MENU_ITEM(submenu2, MSG_CONTROL, lcd_control_menu); 
+  }
+  
+  
+  
+    END_MENU();
+  
     //
     // Auto Home
-    //
+    /* commented out by Kalle
     MENU_ITEM(gcode, MSG_AUTO_HOME, PSTR("G28"));
     #if ENABLED(INDIVIDUAL_AXIS_HOMING_MENU)
       MENU_ITEM(gcode, MSG_AUTO_HOME_X, PSTR("G28 X"));
       MENU_ITEM(gcode, MSG_AUTO_HOME_Y, PSTR("G28 Y"));
-      MENU_ITEM(gcode, MSG_AUTO_HOME_Z, PSTR("G28 Z"));
+      MENU_ITEM(gcode, MSG_AUTO_HOME_Z, PSTR("G28 Z")); 
     #endif
 
     //
@@ -1254,8 +1548,9 @@ void kill_screen(const char* lcd_msg) {
     #if ENABLED(SDSUPPORT) && ENABLED(MENU_ADDAUTOSTART)
       MENU_ITEM(function, MSG_AUTOSTART, lcd_autostart_sd);
     #endif
-
-    END_MENU();
+  END_MENU();
+  */ 
+    
   }
 
   #if ENABLED(DELTA_CALIBRATION_MENU)
@@ -1317,13 +1612,15 @@ void kill_screen(const char* lcd_msg) {
     if (LCD_CLICKED) { lcd_goto_previous_menu(true); return; }
     ENCODER_DIRECTION_NORMAL();
     if (encoderPosition) {
-      refresh_cmd_timeout();
-      current_position[axis] += float((int32_t)encoderPosition) * move_menu_scale;
+    refresh_cmd_timeout();
+    if(encoderPosition%ENCODER_STEPS_PER_MENU_ITEM==0){ //Kalle to make one knob-step equal one movescale!
+      current_position[axis] += float((int32_t)encoderPosition) * move_menu_scale/ENCODER_STEPS_PER_MENU_ITEM; //Kalle ENCODER_STEPS_PER_MENU_ITEM=4
       if (min_software_endstops) NOLESS(current_position[axis], min);
       if (max_software_endstops) NOMORE(current_position[axis], max);
       encoderPosition = 0;
       manual_move_to_current(axis);
-      lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
+    }
+    lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
     }
     if (lcdDrawUpdate) lcd_implementation_drawedit(name, ftostr41sign(current_position[axis]));
   }
@@ -1341,7 +1638,7 @@ void kill_screen(const char* lcd_msg) {
     #if E_MANUAL > 1
       int8_t eindex=-1
     #endif
-  ) {
+  ) { 
     if (LCD_CLICKED) { lcd_goto_previous_menu(true); return; }
     ENCODER_DIRECTION_NORMAL();
     if (encoderPosition) {
@@ -1401,15 +1698,18 @@ void kill_screen(const char* lcd_msg) {
   static void _lcd_move_menu_axis() {
     START_MENU();
     MENU_ITEM(back, MSG_MOVE_AXIS);
-
+  
     if (_MOVE_XYZ_ALLOWED) {
-      MENU_ITEM(submenu, MSG_MOVE_X, lcd_move_x);
-      MENU_ITEM(submenu, MSG_MOVE_Y, lcd_move_y);
+    if (move_menu_scale < 10.0) { // Since i use z-move the most - it'n now moved to top Kalle
+      if (_MOVE_XYZ_ALLOWED) MENU_ITEM(submenu, MSG_MOVE_Z, lcd_move_z);
+    }
+    MENU_ITEM(submenu, MSG_MOVE_X, lcd_move_x);
+    MENU_ITEM(submenu, MSG_MOVE_Y, lcd_move_y);
     }
 
-    if (move_menu_scale < 10.0) {
-      if (_MOVE_XYZ_ALLOWED) MENU_ITEM(submenu, MSG_MOVE_Z, lcd_move_z);
-
+    
+    
+  /* //Kalle
       #if ENABLED(SWITCHING_EXTRUDER)
         if (active_extruder)
           MENU_ITEM(gcode, MSG_SELECT MSG_E1, PSTR("T0"));
@@ -1417,7 +1717,7 @@ void kill_screen(const char* lcd_msg) {
           MENU_ITEM(gcode, MSG_SELECT MSG_E2, PSTR("T1"));
       #endif
 
-      MENU_ITEM(submenu, MSG_MOVE_E, lcd_move_e);
+      MENU_ITEM(submenu, MSG_MOVE_E, lcd_move_e); 
       #if E_MANUAL > 1
         MENU_ITEM(submenu, MSG_MOVE_E MSG_MOVE_E1, lcd_move_e0);
         MENU_ITEM(submenu, MSG_MOVE_E MSG_MOVE_E2, lcd_move_e1);
@@ -1428,7 +1728,8 @@ void kill_screen(const char* lcd_msg) {
           #endif
         #endif
       #endif
-    }
+    */
+    
     END_MENU();
   }
 
@@ -1454,12 +1755,13 @@ void kill_screen(const char* lcd_msg) {
   static void lcd_move_menu() {
     START_MENU();
     MENU_ITEM(back, MSG_PREPARE);
-
-    if (_MOVE_XYZ_ALLOWED)
-      MENU_ITEM(submenu, MSG_MOVE_10MM, lcd_move_menu_10mm);
+  
+  MENU_ITEM(submenu, MSG_MOVE_01MM, lcd_move_menu_01mm);  //Since I use 0.1mm the most it's now moved to top Kalle
 
     MENU_ITEM(submenu, MSG_MOVE_1MM, lcd_move_menu_1mm);
-    MENU_ITEM(submenu, MSG_MOVE_01MM, lcd_move_menu_01mm);
+  
+  if (_MOVE_XYZ_ALLOWED)
+      MENU_ITEM(submenu, MSG_MOVE_10MM, lcd_move_menu_10mm);
     //TODO:X,Y,Z,E
     END_MENU();
   }
@@ -1473,9 +1775,9 @@ void kill_screen(const char* lcd_msg) {
   static void lcd_control_menu() {
     START_MENU();
     MENU_ITEM(back, MSG_MAIN);
-    MENU_ITEM(submenu, MSG_TEMPERATURE, lcd_control_temperature_menu);
+    //MENU_ITEM(submenu, MSG_TEMPERATURE, lcd_control_temperature_menu);
     MENU_ITEM(submenu, MSG_MOTION, lcd_control_motion_menu);
-    MENU_ITEM(submenu, MSG_VOLUMETRIC, lcd_control_volumetric_menu);
+    //MENU_ITEM(submenu, MSG_VOLUMETRIC, lcd_control_volumetric_menu); //Not used by my Kalle
 
     #if HAS_LCD_CONTRAST
       //MENU_ITEM_EDIT(int3, MSG_CONTRAST, &lcd_contrast, 0, 63);
@@ -2350,6 +2652,7 @@ void kill_screen(const char* lcd_msg) {
    */
   static void menu_action_back() { lcd_goto_previous_menu(); }
   static void menu_action_submenu(screenFunc_t func) { lcd_save_previous_menu(); lcd_goto_screen(func); }
+  static void menu_action_submenu2(screenFunc_t func) { lcd_save_previous_menu(); lcd_goto_screen(func,false,ENCODER_STEPS_PER_MENU_ITEM); } //Kalle jump down ENCODER_STEPS_PER_MENU_ITEM ("5") encoder steps = one menu item
   static void menu_action_gcode(const char* pgcode) { enqueue_and_echo_commands_P(pgcode); }
   static void menu_action_function(screenFunc_t func) { (*func)(); }
 
@@ -3164,3 +3467,8 @@ char* ftostr52sp(const float& x) {
 }
 
 #endif // ULTRA_LCD
+
+
+
+
+
