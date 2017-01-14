@@ -21,25 +21,22 @@ This is what I aimed for:<br>
 ..* If I e.g. enter the submenu “Move Axis” from the “Prep-menu”– most likely my next action won’t be to go back to the prep-menu, but to press the first real option (2nd option) 
 
 And this is my custom menu that I ended up with: <br>
-* Startscreen
-..* Back
-..* Move Axis
-..* 0.1mm (Z,X,Y)
-* 2
-
-
--1mm (Z,X,Y)
-      -10mm (X,Y)
-    -Probe for Z0
-	  -Zero only Z
-	  -Zero All
-    -Print from SD
-    -Go To Home (All/X/Y/Z)
-    -Disable steppers
-    -Temp Z offset
-    -Z Homing offset 
-    -Make this home
-    -Store to EEPROM
-    -LOAD from EEPROM
-    -Control
-      -acceleration, jerk, speeds.....
+Startscreen
+- Back
+- Move Axis
+..- 0.1mm (Z,X,Y)
+..-1mm (Z,X,Y)
+..-10mm (X,Y)
+-Probe for Z0
+..-Zero only Z
+..-Zero All
+-Print from SD
+-Go To Home (All/X/Y/Z)
+-Disable steppers
+-Temp Z offset
+-Z Homing offset 
+-Make this home
+-Store to EEPROM
+-LOAD from EEPROM
+-Control
+..-acceleration, jerk, speeds.....
