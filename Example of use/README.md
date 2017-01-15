@@ -19,8 +19,10 @@ This is a toy I made for my 10 months old son Emil:
   1. Manually set machine where you want X0,Y0 (with “move axis” from menu, or by hand) - As you see in the picture above, its in the middle of the "OK"-button!
   2. <b>“Probe for Z0″/”Zero All”</b> (with the Z probes clipped to the router bit and the (1.24 mm thick) probe bottom piece helld against the material top, straight under the router bit!)
 
-<b>3. Facing:</b> I had defined the Origin (Home:X0,Y0,Z0) in Fusion 360 to the model top, and told the facing bit to face off to Z0. Since the surface of my stock piece was a bit uneven, there were parts that was lower than Z0 => need to use my Z0 offset!
-  1. <b>“Temp Z offset”</b> = -0.5 mm (note that the Z value on Status screen now changed from 5mm to 5.5mm => Z=0 is now 5.5 mm down! (Z5 mm is default value after Homing)
+<b>3. Facing:</b> I had defined the Origin (Home:X0,Y0,Z0) in Fusion 360 to the model top, and told the facing bit to face off to Z0 (wich on a perfectly smooth piece of wood would be nothing). Since the surface of my stock piece was a bit uneven, there were probably parts lower than Z0 => Perfect situation to use my Z0 offset!
+  1. <b>“Temp Z offset”</b> = -0.5 mm. 
+    * The only thing this does is to change the current Z-position to Z+0.5 mm. 
+	* Note that the Z value on Status screen now changed from 5mm to 5.5mm => Z=0 is now 5.5 mm down! (Z5 mm is default value after Homing)
   2. Run the Facing-gcode and if needed, decrease the offset even more and run again till smooth surface!
     * Bit: 6mm 4 flutes
     * Speed: 10 mm/s
