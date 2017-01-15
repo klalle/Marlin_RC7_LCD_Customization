@@ -354,14 +354,14 @@ static void lcd_implementation_status_screen() {
 
   bool blink = lcd_blink();
 
-  // Symbols menu graphics, animated fan
+  /*// Symbols menu graphics, animated fan //Kalle -removed fan picure
   u8g.drawBitmapP(9, 1, STATUS_SCREENBYTEWIDTH, STATUS_SCREENHEIGHT,
     #if HAS_FAN0
       blink && fanSpeeds[0] ? status_screen0_bmp : status_screen1_bmp
     #else
       status_screen0_bmp
     #endif
-  );
+  );*/
 
   // Status Menu Font for SD info, Heater status, Fan, XYZ
   lcd_setFont(FONT_STATUSMENU);
@@ -394,9 +394,10 @@ static void lcd_implementation_status_screen() {
     lcd_print(buffer);
 
   #endif
-
+	
+	/*Remove not used 3D-printer stuff: Kalle
   // Extruders
-  HOTEND_LOOP() _draw_heater_status(5 + e * 25, e);
+  HOTEND_LOOP() _draw_heater_status(5 + e * 25, e); 
 
   // Heated bed
   #if HOTENDS < 4 && HAS_TEMP_BED
@@ -412,6 +413,7 @@ static void lcd_implementation_status_screen() {
       lcd_print('%');
     }
   #endif
+	*/
 
   // X, Y, Z-Coordinates
   // Before homing the axis letters are blinking 'X' <-> '?'.
