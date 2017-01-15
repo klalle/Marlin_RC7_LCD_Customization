@@ -13,10 +13,10 @@ This is a toy I made for my 10 months old son Emil:
 ###The remote is routed in 7 steps, and this is how I used the menu:<br>
 <b>1. Define the Z-probe bottom thikness:</b>
   1. <b>Z homing offset</b> = 1.24 mm
-  2. Store to EEPROM - To save the Z homing offset to eeprom so that <b>step one never has to be entered again!</b>
+  2. <b>Store to EEPROM</b> - To save the Z homing offset to eeprom so that <b>step one never has to be entered again!</b>
 
 <b>2. Define X0, Y0, Z0 (Home)</b>
-  1. Manually set machine where you want X0,Y0 (with “move axis” from menu, or by hand)
+  1. Manually set machine where you want X0,Y0 (with “move axis” from menu, or by hand) - As you see in the picture above, its in the middle of the "OK"-button!
   2. <b>“Probe for Z0″/”Zero All”</b> (with the Z probes clipped to the router bit and the (1.24 mm thick) probe bottom piece helld against the material top, straight under the router bit!)
 
 <b>3. Facing:</b> I had defined the Origin (Home:X0,Y0,Z0) in Fusion 360 to the model top, and told the facing bit to face off to Z0. Since the surface of my stock piece was a bit uneven, there were parts that was lower than Z0 => need to use my Z0 offset!
