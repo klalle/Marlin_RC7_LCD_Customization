@@ -529,7 +529,7 @@ function onSectionEnd() {
 function onClose() {
   setCoolant(COOLANT_OFF);
 
-  writeBlock("G1 Z15 F150"); // Retract Z to 15mm //Kalle
+  writeBlock("G1 Z15 F360"); // Retract Z to 15mm //Kalle
   writeBlock("G1 X0 Y0 F2000"); // Return to x-y to zero. //Kalle
   zOutput.reset();
 
