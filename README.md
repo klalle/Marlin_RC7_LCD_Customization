@@ -36,6 +36,7 @@ I was going crazy when trying to access the menu objects I needed through the LC
   * Go To Home
     * All/X/Y/Z
   * Disable steppers
+  * Speed [%]
   * Temp Z offset
   * Z Homing offset 
   * Make this home
@@ -43,3 +44,9 @@ I was going crazy when trying to access the menu objects I needed through the LC
   * LOAD from EEPROM
   * Control
     * acceleration, jerk, speeds.....
+
+Update 19/1-17:
+* Added function to set coordinates first - then execute to go to set position
+* Move Z or XY first dependent on if Z is bellow or above 0 (affects "homing" and "set coordinates")
+* Added the "Speed"-function even when there is nothing currently printing
+* Added Mount/UnMount function to the SD-card (so I dont have to restart when changing the SD-card)
