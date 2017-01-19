@@ -45,8 +45,10 @@ I was going crazy when trying to access the menu objects I needed through the LC
   * Control
     * acceleration, jerk, speeds.....
 
-Update 19/1-17:
+<b>Update 19/1-17:</b>
 * Added function to set coordinates first - then execute to go to set position
 * Move Z or XY first dependent on if Z is bellow or above 0 (affects "homing" and "set coordinates")
 * Added the "Speed"-function even when there is nothing currently printing
 * Added Mount/UnMount function to the SD-card (so I dont have to restart when changing the SD-card)
+* Made the gcode return to X0 and Y0 after finnished file in post-processor 
+ * if something fuckes up during e.g. SD-card swap it's good to know we're at X0Y0 -just probe for Z again! 
