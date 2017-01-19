@@ -1193,15 +1193,17 @@ void kill_screen(const char* lcd_msg) {
     if (LCD_CLICKED) { 
     if(HomeZText=="YES!"){
         HomeZText = "CANCEL";
+				if(All){
+					//Zero x and y to current position!
+					enqueue_and_echo_commands_P(PSTR("G92 X0 Y0"));
+        }
         //Home Z
         enqueue_and_echo_commands_P(PSTR("G28 Z"));
-    if(All){
-      //Zero x and y to current position!
-      enqueue_and_echo_commands_P(PSTR("G92 X0 Y0"));
-        }
-    //Move z up after homing
-    enqueue_and_echo_commands_P(PSTR("G1 F150 Z5"));
-         //Tell Marlin that we know where all axis are
+    
+				//Move z up after homing
+				enqueue_and_echo_commands_P(PSTR("G1 F300 Z5"));
+				
+        //Tell Marlin that we know where all axis are
         axis_known_position[Z_AXIS] = true; //Otherwise they'll blink
         axis_known_position[X_AXIS] = true;
         axis_known_position[Y_AXIS] = true;
@@ -1239,21 +1241,21 @@ void kill_screen(const char* lcd_msg) {
     
     //Zero x and y to current position!
     //enqueue_and_echo_commands_P(PSTR("G92 X0 Y0"));
-  lcd_AutoHome_menu(true);
+		lcd_AutoHome_menu(true);
     //lcd_AutoHomeOnlyZ_menu();
       
   }
   
   static void lcd_AutoHomeZ_menu() {
-  START_MENU();
+		START_MENU();
     //
     // ^ Main
     MENU_ITEM(back, MSG_MAIN);
   
-  MENU_ITEM(submenu, "Zero only Z", lcd_AutoHomeOnlyZ_menu); 
-  MENU_ITEM(submenu, "Zero all", lcd_AutoHomeAll_menu); 
-  END_MENU();
-   }
+		MENU_ITEM(submenu, "Zero only Z", lcd_AutoHomeOnlyZ_menu); 
+		MENU_ITEM(submenu, "Zero all", lcd_AutoHomeAll_menu); 
+		END_MENU();
+  }
   
     /**
    *
@@ -1264,23 +1266,23 @@ void kill_screen(const char* lcd_msg) {
 
   static void lcd_setZProbeHeight_menu() {
     if (LCD_CLICKED) { 
-    //Maybe I need to update the planner?
-    lcd_goto_previous_menu(true); 
-    return; 
-  }
+			//Maybe I need to update the planner?
+			lcd_goto_previous_menu(true); 
+			return; 
+		}
     ENCODER_DIRECTION_NORMAL();
     if (encoderPosition) { 
-    refresh_cmd_timeout();
-  
-    //For each step on the knob /hole step = ENCODER_STEPS_PER_MENU_ITEM = 4
-    if(encoderPosition % 4 == 0 && home_offset[Z_AXIS] + float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM >= 0){ //Only allow positive offset
-       home_offset[Z_AXIS] += float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
-       current_position[Z_AXIS] += float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
-       encoderPosition = 0;       
-    }
+			refresh_cmd_timeout();
+		
+			//For each step on the knob /hole step = ENCODER_STEPS_PER_MENU_ITEM = 4
+			if(encoderPosition % 4 == 0 && home_offset[Z_AXIS] + float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM >= 0){ //Only allow positive offset
+				 home_offset[Z_AXIS] += float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
+				 current_position[Z_AXIS] += float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
+				 encoderPosition = 0;       
+			}
         
     
-        lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
+       lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
     }
     if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR("Offset [mm]"), ftostr32(home_offset[Z_AXIS]));//ftostr41sign(home_offset[Z_AXIS]));
   }
@@ -1295,27 +1297,27 @@ void kill_screen(const char* lcd_msg) {
   
     static void lcd_setZTempOffset_menu() {
     if (LCD_CLICKED) { 
-    //The distance that XYZ has been offset by G92. Reset by G28.
-    position_shift[Z_AXIS] -= tempZOffset; // Offset the coordinate space
-    
-    //Update the planner with the acutal positions 
-    planner.set_position_mm(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
-    
-    lcd_goto_previous_menu(true); 
-    return; }
+			//The distance that XYZ has been offset by G92. Reset by G28.
+			position_shift[Z_AXIS] -= tempZOffset; // Offset the coordinate space
+			
+			//Update the planner with the acutal positions 
+			planner.set_position_mm(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
+			
+			lcd_goto_previous_menu(true); 
+			return; 
+		}
     ENCODER_DIRECTION_NORMAL();
     if (encoderPosition) {
-    refresh_cmd_timeout();
-    //For each step on the knob /hole step = 4
-    if(encoderPosition % ENCODER_STEPS_PER_MENU_ITEM == 0){
-      tempZOffset+= float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
-    
-      current_position[Z_AXIS] -= float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM; //call sync_plan_position soon after this.
-      encoderPosition = 0;
-    }
-    
-    
-    lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
+			refresh_cmd_timeout();
+			//For each step on the knob /hole step = 4
+			if(encoderPosition % ENCODER_STEPS_PER_MENU_ITEM == 0){
+				tempZOffset+= float((int32_t)encoderPosition) * 0.1/ENCODER_STEPS_PER_MENU_ITEM;
+			
+				current_position[Z_AXIS] -= float((int32_t)encoderPosition) * 0.1/ENCODER_STEPS_PER_MENU_ITEM; //call sync_plan_position soon after this.
+				encoderPosition = 0;
+			}
+			
+			lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
     }
     if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR("Offset [mm]"), ftostr32(tempZOffset));//ftostr41sign(home_offset[Z_AXIS]));
   }
@@ -1326,10 +1328,15 @@ void kill_screen(const char* lcd_msg) {
    * 
    */
    static void HomeAll() {
+		 //Start by lifting Z to safe height
+		 enqueue_and_echo_commands_P(PSTR("G1 F300 Z15"));
+		 
+		 //Move X,Y
+    enqueue_and_echo_commands_P(PSTR("G1 F2000 X0 Y0"));
+		
     //Move z
     enqueue_and_echo_commands_P(PSTR("G1 F300 Z0"));
-    //Move X,Y
-    enqueue_and_echo_commands_P(PSTR("G1 F2000 X0 Y0"));
+    
    
    }
   static void lcd_GoToHome_menu() {
@@ -1369,7 +1376,7 @@ void kill_screen(const char* lcd_msg) {
       -acceleration, jerk, speeds.....
 	  
 	  
-	  För att lägga igop PSTR: 
+	  För att lägga igop PSTR: MENU_ITEM(gcode, "X", PSTR("G1 F2000 X0"));
 	  void funktionsnamn(const char *name){
 		  char cmd[4 + strlen(name) + 1]; // Room for "M23 ", filename, and null
 		  sprintf_P(cmd, PSTR("M23 %s"), name);
@@ -1682,6 +1689,55 @@ void kill_screen(const char* lcd_msg) {
       #endif
     #endif
   #endif
+	
+	//Kalle
+	float X_Coordinate_Move;
+	float Y_Coordinate_Move;
+	float Z_Coordinate_Move;
+	
+	//För att lägga igop PSTR: MENU_ITEM(gcode, "X", PSTR("G1 F2000 X0"));
+	  void MoveToCoordinates(){
+			
+			char cmd[30];
+			//Start with Z to move it up first...
+      sprintf_P(cmd, PSTR("G1 F360 Z%i"), current_position[Z_AXIS] + Z_Coordinate_Move);
+			sprintf_P(cmd, PSTR("G1 F2000 X%i X%i"), current_position[X_AXIS] + X_Coordinate_Move, current_position[Y_AXIS] + Y_Coordinate_Move);
+
+      enqueue_and_echo_command(cmd);
+			//char cmd[30];
+      //sprintf_P(cmd, PSTR("M303 U1 E%i S%i"), e, autotune_temp[e]);
+      //enqueue_and_echo_command(cmd);
+			
+		  /*char cmd[4 + strlen(name) + 1]; // Room for "M23 ", name, and null
+		  sprintf_P(cmd, PSTR("M23 %s"), name);
+		  for (char *c = &cmd[4]; *c; c++) *c = tolower(*c);
+		  enqueue_and_echo_command(cmd); */
+		}
+		  //till skillnad från: enqueue_and_echo_commands_P(PSTR("M24"));
+	
+	static void lcd_SetCoodinatesAndMove(){
+		START_MENU();
+		//MENU_ITEM_EDIT(int3, "X", &feedrate_percentage, 10, 999);
+		//MENU_ITEM_EDIT_CALLBACK(float52, MSG_PID_I ELABEL, &raw_Ki, 0.01, 9990, copy_and_scalePID_i_E ## eindex); 
+		if (move_menu_scale == 10) {
+			MENU_ITEM_EDIT(float32, "X", &X_Coordinate_Move, -100, 100);
+			MENU_ITEM_EDIT(float32, "X", &Y_Coordinate_Move, -100, 100);
+			MENU_ITEM_EDIT(float32, "X", &Z_Coordinate_Move, -100, 100);
+		}
+		else if (move_menu_scale == 1) {
+			MENU_ITEM_EDIT(float32, "X", &X_Coordinate_Move, -100, 100);
+			MENU_ITEM_EDIT(float32, "X", &Y_Coordinate_Move, -100, 100);
+			MENU_ITEM_EDIT(float32, "X", &Z_Coordinate_Move, -100, 100);
+		}
+		else (move_menu_scale == 0.1) {
+			MENU_ITEM_EDIT(float32, "X", &X_Coordinate_Move, -10.0, 10.0);
+			MENU_ITEM_EDIT(float32, "X", &Y_Coordinate_Move, -10.0, 10.0);
+			MENU_ITEM_EDIT(float32, "X", &Z_Coordinate_Move, -10.0, 10.0);
+		}
+		
+		//MENU_ITEM_EDIT(float43, MSG_BED_Z, &mbl.z_offset, -1, 1); home_offset[Z_AXIS] += float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
+		END_MENU();
+	}
 
   /**
    *
@@ -1698,14 +1754,16 @@ void kill_screen(const char* lcd_msg) {
   static void _lcd_move_menu_axis() {
     START_MENU();
     MENU_ITEM(back, MSG_MOVE_AXIS);
-  
+		MENU_ITEM(submenu, "Set coordinates", lcd_SetCoodinatesAndMove);
     if (_MOVE_XYZ_ALLOWED) {
-    if (move_menu_scale < 10.0) { // Since i use z-move the most - it'n now moved to top Kalle
-      if (_MOVE_XYZ_ALLOWED) MENU_ITEM(submenu, MSG_MOVE_Z, lcd_move_z);
-    }
-    MENU_ITEM(submenu, MSG_MOVE_X, lcd_move_x);
-    MENU_ITEM(submenu, MSG_MOVE_Y, lcd_move_y);
-    }
+			if (move_menu_scale < 10.0) { // Since i use z-move the most - it'n now moved to top Kalle
+				if (_MOVE_XYZ_ALLOWED) MENU_ITEM(submenu, "Move Z", lcd_move_z);
+			}
+			MENU_ITEM(submenu, "Move X", lcd_move_x);
+			MENU_ITEM(submenu, "Move Y", lcd_move_y);
+			
+			//MENU_ITEM(submenu, "Move to Xx", lcd_move_y); //Kalle Set coordinate - then move!
+		}
 
     
     
