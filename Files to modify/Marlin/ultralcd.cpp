@@ -1193,16 +1193,16 @@ void kill_screen(const char* lcd_msg) {
     if (LCD_CLICKED) { 
     if(HomeZText=="YES!"){
         HomeZText = "CANCEL";
-				if(All){
-					//Zero x and y to current position!
-					enqueue_and_echo_commands_P(PSTR("G92 X0 Y0"));
+        if(All){
+          //Zero x and y to current position!
+          enqueue_and_echo_commands_P(PSTR("G92 X0 Y0"));
         }
         //Home Z
         enqueue_and_echo_commands_P(PSTR("G28 Z"));
     
-				//Move z up after homing
-				enqueue_and_echo_commands_P(PSTR("G1 F300 Z5"));
-				
+        //Move z up after homing
+        enqueue_and_echo_commands_P(PSTR("G1 F300 Z5"));
+        
         //Tell Marlin that we know where all axis are
         axis_known_position[Z_AXIS] = true; //Otherwise they'll blink
         axis_known_position[X_AXIS] = true;
@@ -1241,20 +1241,20 @@ void kill_screen(const char* lcd_msg) {
     
     //Zero x and y to current position!
     //enqueue_and_echo_commands_P(PSTR("G92 X0 Y0"));
-		lcd_AutoHome_menu(true);
+    lcd_AutoHome_menu(true);
     //lcd_AutoHomeOnlyZ_menu();
       
   }
   
   static void lcd_AutoHomeZ_menu() {
-		START_MENU();
+    START_MENU();
     //
     // ^ Main
     MENU_ITEM(back, MSG_MAIN);
   
-		MENU_ITEM(submenu, "Zero only Z", lcd_AutoHomeOnlyZ_menu); 
-		MENU_ITEM(submenu, "Zero all", lcd_AutoHomeAll_menu); 
-		END_MENU();
+    MENU_ITEM(submenu, "Zero only Z", lcd_AutoHomeOnlyZ_menu); 
+    MENU_ITEM(submenu, "Zero all", lcd_AutoHomeAll_menu); 
+    END_MENU();
   }
   
     /**
@@ -1266,20 +1266,20 @@ void kill_screen(const char* lcd_msg) {
 
   static void lcd_setZProbeHeight_menu() {
     if (LCD_CLICKED) { 
-			//Maybe I need to update the planner?
-			lcd_goto_previous_menu(true); 
-			return; 
-		}
+      //Maybe I need to update the planner?
+      lcd_goto_previous_menu(true); 
+      return; 
+    }
     ENCODER_DIRECTION_NORMAL();
     if (encoderPosition) { 
-			refresh_cmd_timeout();
-		
-			//For each step on the knob /hole step = ENCODER_STEPS_PER_MENU_ITEM = 4
-			if(encoderPosition % 4 == 0 && home_offset[Z_AXIS] + float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM >= 0){ //Only allow positive offset
-				 home_offset[Z_AXIS] += float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
-				 current_position[Z_AXIS] += float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
-				 encoderPosition = 0;       
-			}
+      refresh_cmd_timeout();
+    
+      //For each step on the knob /hole step = ENCODER_STEPS_PER_MENU_ITEM = 4
+      if(encoderPosition % 4 == 0 && home_offset[Z_AXIS] + float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM >= 0){ //Only allow positive offset
+         home_offset[Z_AXIS] += float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
+         current_position[Z_AXIS] += float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
+         encoderPosition = 0;       
+      }
         
     
        lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
@@ -1295,29 +1295,29 @@ void kill_screen(const char* lcd_msg) {
    */
   float tempZOffset =0; //to keep track of the total temp offset!
   
-    static void lcd_setZTempOffset_menu() {
+  static void lcd_setZTempOffset_menu() {
     if (LCD_CLICKED) { 
-			//The distance that XYZ has been offset by G92. Reset by G28.
-			position_shift[Z_AXIS] -= tempZOffset; // Offset the coordinate space
-			
-			//Update the planner with the acutal positions 
-			planner.set_position_mm(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
-			
-			lcd_goto_previous_menu(true); 
-			return; 
-		}
+      //The distance that XYZ has been offset by G92. Reset by G28.
+      position_shift[Z_AXIS] -= tempZOffset; // Offset the coordinate space
+      
+      //Update the planner with the acutal positions 
+      planner.set_position_mm(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
+      
+      lcd_goto_previous_menu(true); 
+      return; 
+    }
     ENCODER_DIRECTION_NORMAL();
     if (encoderPosition) {
-			refresh_cmd_timeout();
-			//For each step on the knob /hole step = 4
-			if(encoderPosition % ENCODER_STEPS_PER_MENU_ITEM == 0){
-				tempZOffset+= float((int32_t)encoderPosition) * 0.1/ENCODER_STEPS_PER_MENU_ITEM;
-			
-				current_position[Z_AXIS] -= float((int32_t)encoderPosition) * 0.1/ENCODER_STEPS_PER_MENU_ITEM; //call sync_plan_position soon after this.
-				encoderPosition = 0;
-			}
-			
-			lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
+      refresh_cmd_timeout();
+      //For each step on the knob /hole step = 4
+      if(encoderPosition % ENCODER_STEPS_PER_MENU_ITEM == 0){
+        tempZOffset+= float((int32_t)encoderPosition) * 0.1/ENCODER_STEPS_PER_MENU_ITEM;
+      
+        current_position[Z_AXIS] -= float((int32_t)encoderPosition) * 0.1/ENCODER_STEPS_PER_MENU_ITEM; //call sync_plan_position soon after this.
+        encoderPosition = 0;
+      }
+      
+      lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
     }
     if (lcdDrawUpdate) lcd_implementation_drawedit(PSTR("Offset [mm]"), ftostr32(tempZOffset));//ftostr41sign(home_offset[Z_AXIS]));
   }
@@ -1328,12 +1328,12 @@ void kill_screen(const char* lcd_msg) {
    * 
    */
    static void HomeAll() {
-		 //Start by lifting Z to safe height
-		 enqueue_and_echo_commands_P(PSTR("G1 F300 Z15"));
-		 
-		 //Move X,Y
+     //Start by lifting Z to safe height
+     enqueue_and_echo_commands_P(PSTR("G1 F300 Z30"));
+     
+     //Move X,Y
     enqueue_and_echo_commands_P(PSTR("G1 F2000 X0 Y0"));
-		
+    
     //Move z
     enqueue_and_echo_commands_P(PSTR("G1 F300 Z0"));
     
@@ -1358,15 +1358,16 @@ void kill_screen(const char* lcd_msg) {
    -Startscreen
     -Back
     -Move Axis
-      -0.1mm (Z,X,Y) 
+      -0.1mm (Z,X,Y) option set coordiates first -then execute "G1"
       -1mm (Z,X,Y)
       -10mm (X,Y)
     -Probe for Z0
-	  -Zero only Z
-	  -Zero All
+    -Zero only Z
+    -Zero All
     -Print from SD
     -Go To Home (All/X/Y/Z)
     -Disable steppers
+		-Speed [%]
     -Temp Z offset
     -Z Homing offset 
     -Make this home
@@ -1374,16 +1375,7 @@ void kill_screen(const char* lcd_msg) {
     -LOAD from EEPROM
     -Control
       -acceleration, jerk, speeds.....
-	  
-	  
-	  För att lägga igop PSTR: MENU_ITEM(gcode, "X", PSTR("G1 F2000 X0"));
-	  void funktionsnamn(const char *name){
-		  char cmd[4 + strlen(name) + 1]; // Room for "M23 ", filename, and null
-		  sprintf_P(cmd, PSTR("M23 %s"), name);
-		  for (char *c = &cmd[4]; *c; c++) *c = tolower(*c);
-		  enqueue_and_echo_command(cmd); 
-		  //till skillnad från: enqueue_and_echo_commands_P(PSTR("M24"));
-	  }
+    
    */
 
   static void lcd_prepare_menu() {
@@ -1397,34 +1389,36 @@ void kill_screen(const char* lcd_msg) {
   if (planner.movesplanned() || IS_SD_PRINTING) {
 
     // Speed:
-    MENU_ITEM_EDIT(int3, MSG_SPEED, &feedrate_percentage, 10, 999);
+    MENU_ITEM_EDIT(int3,  "Speed [%]", &feedrate_percentage, 10, 999);
     
     //SD-card:
     #if ENABLED(SDSUPPORT)
         if (card.cardOK) {
-		    if (card.isFileOpen()) {
-				if (card.sdprinting)
-					MENU_ITEM(function, MSG_PAUSE_PRINT, lcd_sdcard_pause);
-				else
-					MENU_ITEM(function, MSG_RESUME_PRINT, lcd_sdcard_resume);
-					MENU_ITEM(function, MSG_STOP_PRINT, lcd_sdcard_stop);
-		    }
-			else {
-				MENU_ITEM(submenu2, MSG_CARD_MENU, lcd_sdcard_menu);
-				#if !PIN_EXISTS(SD_DETECT)
-				MENU_ITEM(gcode, MSG_CNG_SDCARD, PSTR("M21"));  // SD-card changed by user
-				#endif
-			}
-	  }
+        if (card.isFileOpen()) {
+        if (card.sdprinting)
+          MENU_ITEM(function, MSG_PAUSE_PRINT, lcd_sdcard_pause);
+        else
+          MENU_ITEM(function, MSG_RESUME_PRINT, lcd_sdcard_resume);
+          MENU_ITEM(function, MSG_STOP_PRINT, lcd_sdcard_stop);
+        }
       else {
-		  MENU_ITEM(submenu2, MSG_NO_CARD, lcd_sdcard_menu);
-		  #if !PIN_EXISTS(SD_DETECT)
-			MENU_ITEM(gcode, MSG_INIT_SDCARD, PSTR("M21")); // Manually initialize the SD-card via user interface
-		  #endif
+        MENU_ITEM(submenu2, MSG_CARD_MENU, lcd_sdcard_menu);
+        #if !PIN_EXISTS(SD_DETECT)
+        MENU_ITEM(gcode, MSG_CNG_SDCARD, PSTR("M21"));  // SD-card changed by user
+        #endif
+      }
+    }
+      else {
+      MENU_ITEM(submenu2, MSG_NO_CARD, lcd_sdcard_menu);
+      #if !PIN_EXISTS(SD_DETECT)
+      MENU_ITEM(gcode, MSG_INIT_SDCARD, PSTR("M21")); // Manually initialize the SD-card via user interface
+      #endif
       }
     #endif //SDSUPPORT
     }
   else{ //The actual prepare menu
+		//reset speed%
+		feedrate_percentage=100;
     // Move Axis
     MENU_ITEM(submenu2, MSG_MOVE_AXIS, lcd_move_menu);
     
@@ -1433,26 +1427,27 @@ void kill_screen(const char* lcd_msg) {
     
     //SD-card: 
     #if ENABLED(SDSUPPORT)
-        if (card.cardOK) {
-		    if (card.isFileOpen()) {
-				if (card.sdprinting)
-					MENU_ITEM(function, MSG_PAUSE_PRINT, lcd_sdcard_pause);
-				else
-					MENU_ITEM(function, MSG_RESUME_PRINT, lcd_sdcard_resume);
-					MENU_ITEM(function, MSG_STOP_PRINT, lcd_sdcard_stop);
-		    }
-			else {
-				MENU_ITEM(submenu2, MSG_CARD_MENU, lcd_sdcard_menu);
-				#if !PIN_EXISTS(SD_DETECT)
-				MENU_ITEM(gcode, MSG_CNG_SDCARD, PSTR("M21"));  // SD-card changed by user
-				#endif
-			}
-	  }
+      if (card.cardOK) {
+        if (card.isFileOpen()) {
+          if (card.sdprinting)
+            MENU_ITEM(function, MSG_PAUSE_PRINT, lcd_sdcard_pause);
+          else
+            MENU_ITEM(function, MSG_RESUME_PRINT, lcd_sdcard_resume);
+            MENU_ITEM(function, MSG_STOP_PRINT, lcd_sdcard_stop);
+          }
+        else {
+          MENU_ITEM(submenu2, MSG_CARD_MENU, lcd_sdcard_menu);
+
+          #if !PIN_EXISTS(SD_DETECT)
+            MENU_ITEM(gcode, "Mount card", PSTR("M21"));  // SD-card changed by user
+          #endif
+        }
+      }
       else {
-		  MENU_ITEM(submenu2, MSG_NO_CARD, lcd_sdcard_menu);
-		  #if !PIN_EXISTS(SD_DETECT)
-			MENU_ITEM(gcode, MSG_INIT_SDCARD, PSTR("M21")); // Manually initialize the SD-card via user interface
-		  #endif
+      MENU_ITEM(submenu2, MSG_NO_CARD, lcd_sdcard_menu);
+      #if !PIN_EXISTS(SD_DETECT)
+        MENU_ITEM(gcode, "Mount card", PSTR("M21")); // Manually initialize the SD-card via user interface
+      #endif
       }
     #endif //SDSUPPORT
     
@@ -1464,6 +1459,9 @@ void kill_screen(const char* lcd_msg) {
     
     //Set a temporary Z offset
     MENU_ITEM(submenu, "Temp Z offset", lcd_setZTempOffset_menu);
+
+    // Speed:
+    //MENU_ITEM_EDIT(int3, "Speed [%]", &feedrate_percentage, 10, 999);
     
     //Set Z-Homing offset (Height of probe bottom material) good idea to save to eeprom after this
     MENU_ITEM(submenu, "Z homing offset", lcd_setZProbeHeight_menu);
@@ -1689,55 +1687,104 @@ void kill_screen(const char* lcd_msg) {
       #endif
     #endif
   #endif
-	
-	//Kalle
-	float X_Coordinate_Move;
-	float Y_Coordinate_Move;
-	float Z_Coordinate_Move;
-	
-	//För att lägga igop PSTR: MENU_ITEM(gcode, "X", PSTR("G1 F2000 X0"));
-	  void MoveToCoordinates(){
-			
-			char cmd[30];
-			//Start with Z to move it up first...
-      sprintf_P(cmd, PSTR("G1 F360 Z%i"), current_position[Z_AXIS] + Z_Coordinate_Move);
-			sprintf_P(cmd, PSTR("G1 F2000 X%i X%i"), current_position[X_AXIS] + X_Coordinate_Move, current_position[Y_AXIS] + Y_Coordinate_Move);
-
+  
+  //Kalle
+  
+  float X_Coordinate_Move;
+  float Y_Coordinate_Move;
+  float Z_Coordinate_Move;
+  
+  //För att lägga igop PSTR: MENU_ITEM(gcode, "X", PSTR("G1 F2000 X0"));
+    void MoveToCoordinates(){
+      
+      char buffer_X[15];
+      char buffer_Y[15];
+      char buffer_Z[15];
+      char cmd[30]; 
+      //char cmd2[30]; 
+      //char cmd3[30];
+      dtostrf(X_Coordinate_Move, 1, 2, buffer_X); //1=min width of string, 2=decimals
+      dtostrf(Y_Coordinate_Move, 1, 2, buffer_Y);
+      dtostrf(Z_Coordinate_Move, 1, 2, buffer_Z);
+      
+      if(Z_Coordinate_Move>0){
+        //Start with Z to move it (up) first...
+        sprintf(cmd, "G1 F300 Z%s\0",buffer_Z); // "\0"=end
+        enqueue_and_echo_command(cmd); //execute 1st command
+        
+        sprintf(cmd,"G1 F2000 X%s Y%s\0", buffer_X, buffer_Y);
+      
+      }else{        
+        sprintf(cmd,"G1 F2000 X%s Y%s\0", buffer_X, buffer_Y);
+        enqueue_and_echo_command(cmd); //execute 1st command
+        
+        sprintf(cmd, "G1 F300 Z%s\0",buffer_Z);
+      }
+      //execute 2nd command
       enqueue_and_echo_command(cmd);
-			//char cmd[30];
-      //sprintf_P(cmd, PSTR("M303 U1 E%i S%i"), e, autotune_temp[e]);
-      //enqueue_and_echo_command(cmd);
-			
-		  /*char cmd[4 + strlen(name) + 1]; // Room for "M23 ", name, and null
-		  sprintf_P(cmd, PSTR("M23 %s"), name);
-		  for (char *c = &cmd[4]; *c; c++) *c = tolower(*c);
-		  enqueue_and_echo_command(cmd); */
+      
+    
+    }
+
+   // float CurrentPos;
+      //till skillnad från: enqueue_and_echo_commands_P(PSTR("M24"));
+  static void SetCoordinateWithMultiplier(const char* name, AxisEnum axis) {
+    if (LCD_CLICKED) { 
+			lcd_goto_previous_menu(true); 
+			return; 
 		}
-		  //till skillnad från: enqueue_and_echo_commands_P(PSTR("M24"));
-	
-	static void lcd_SetCoodinatesAndMove(){
-		START_MENU();
-		//MENU_ITEM_EDIT(int3, "X", &feedrate_percentage, 10, 999);
-		//MENU_ITEM_EDIT_CALLBACK(float52, MSG_PID_I ELABEL, &raw_Ki, 0.01, 9990, copy_and_scalePID_i_E ## eindex); 
-		if (move_menu_scale == 10) {
-			MENU_ITEM_EDIT(float32, "X", &X_Coordinate_Move, -100, 100);
-			MENU_ITEM_EDIT(float32, "X", &Y_Coordinate_Move, -100, 100);
-			MENU_ITEM_EDIT(float32, "X", &Z_Coordinate_Move, -100, 100);
-		}
-		else if (move_menu_scale == 1) {
-			MENU_ITEM_EDIT(float32, "X", &X_Coordinate_Move, -100, 100);
-			MENU_ITEM_EDIT(float32, "X", &Y_Coordinate_Move, -100, 100);
-			MENU_ITEM_EDIT(float32, "X", &Z_Coordinate_Move, -100, 100);
-		}
-		else (move_menu_scale == 0.1) {
-			MENU_ITEM_EDIT(float32, "X", &X_Coordinate_Move, -10.0, 10.0);
-			MENU_ITEM_EDIT(float32, "X", &Y_Coordinate_Move, -10.0, 10.0);
-			MENU_ITEM_EDIT(float32, "X", &Z_Coordinate_Move, -10.0, 10.0);
-		}
-		
-		//MENU_ITEM_EDIT(float43, MSG_BED_Z, &mbl.z_offset, -1, 1); home_offset[Z_AXIS] += float((int32_t)encoderPosition) * 0.01/ENCODER_STEPS_PER_MENU_ITEM;
-		END_MENU();
-	}
+    ENCODER_DIRECTION_NORMAL();
+    
+    if (encoderPosition) {
+      refresh_cmd_timeout();
+      if(encoderPosition%ENCODER_STEPS_PER_MENU_ITEM==0){ //Kalle to make one knob-step equal one movescale!
+        float Addition = float((int32_t)encoderPosition) * move_menu_scale/ENCODER_STEPS_PER_MENU_ITEM;
+        if(axis == X_AXIS){
+          X_Coordinate_Move += Addition; //Kalle ENCODER_STEPS_PER_MENU_ITEM=4
+          //CurrentPos=X_Coordinate_Move;
+        }else if(axis == Y_AXIS){
+          Y_Coordinate_Move += Addition;
+          //CurrentPos=Y_Coordinate_Move;
+        }else{
+          Z_Coordinate_Move += Addition;
+          //CurrentPos=Z_Coordinate_Move;
+        }
+        
+        encoderPosition = 0;
+      }
+      lcdDrawUpdate = LCDVIEW_REDRAW_NOW;
+    }
+    //if (lcdDrawUpdate){
+     if(axis == X_AXIS){
+        lcd_implementation_drawedit(name, ftostr41sign(X_Coordinate_Move));
+      }else if(axis == Y_AXIS){
+        lcd_implementation_drawedit(name, ftostr41sign(Y_Coordinate_Move));
+      }else{
+        lcd_implementation_drawedit(name, ftostr41sign(Z_Coordinate_Move));
+      }
+      
+    //}
+  }
+  
+  
+  static void lcd_pos_x() { SetCoordinateWithMultiplier(PSTR(MSG_MOVE_X), X_AXIS); }
+  static void lcd_pos_y() { SetCoordinateWithMultiplier(PSTR(MSG_MOVE_Y), Y_AXIS); }
+  static void lcd_pos_z() { SetCoordinateWithMultiplier(PSTR(MSG_MOVE_Z), Z_AXIS); }
+  
+  static void lcd_SetCoodinatesAndMove(){
+    //CurrentPos=0;
+    
+    START_MENU();
+    MENU_ITEM(back, "Back");
+    
+    MENU_ITEM(submenu, "X", lcd_pos_x);
+    MENU_ITEM(submenu, "Y", lcd_pos_y);
+    MENU_ITEM(submenu, "Z", lcd_pos_z);
+    
+    MENU_ITEM(function, "Execute move", MoveToCoordinates);
+   
+   END_MENU();
+  }
 
   /**
    *
@@ -1752,18 +1799,23 @@ void kill_screen(const char* lcd_msg) {
   #endif
 
   static void _lcd_move_menu_axis() {
+    X_Coordinate_Move = current_position[X_AXIS];
+    Y_Coordinate_Move = current_position[Y_AXIS];
+    Z_Coordinate_Move = current_position[Z_AXIS];
+
+    
     START_MENU();
     MENU_ITEM(back, MSG_MOVE_AXIS);
-		MENU_ITEM(submenu, "Set coordinates", lcd_SetCoodinatesAndMove);
+    MENU_ITEM(submenu, "Set coordinates", lcd_SetCoodinatesAndMove);
     if (_MOVE_XYZ_ALLOWED) {
-			if (move_menu_scale < 10.0) { // Since i use z-move the most - it'n now moved to top Kalle
-				if (_MOVE_XYZ_ALLOWED) MENU_ITEM(submenu, "Move Z", lcd_move_z);
-			}
-			MENU_ITEM(submenu, "Move X", lcd_move_x);
-			MENU_ITEM(submenu, "Move Y", lcd_move_y);
-			
-			//MENU_ITEM(submenu, "Move to Xx", lcd_move_y); //Kalle Set coordinate - then move!
-		}
+      if (move_menu_scale < 10.0) { // Since i use z-move the most - it'n now moved to top Kalle
+        if (_MOVE_XYZ_ALLOWED) MENU_ITEM(submenu, "Move Z", lcd_move_z);
+      }
+      MENU_ITEM(submenu, "Move X", lcd_move_x);
+      MENU_ITEM(submenu, "Move Y", lcd_move_y);
+      
+      //MENU_ITEM(submenu, "Move to Xx", lcd_move_y); //Kalle Set coordinate - then move!
+    }
 
     
     
@@ -2274,6 +2326,7 @@ void kill_screen(const char* lcd_msg) {
         #if !PIN_EXISTS(SD_DETECT)
           MENU_ITEM(function, LCD_STR_REFRESH MSG_REFRESH, lcd_sd_refresh);
         #endif
+        
       }
       else {
         MENU_ITEM(function, LCD_STR_FOLDER "..", lcd_sd_updir);
@@ -2297,6 +2350,8 @@ void kill_screen(const char* lcd_msg) {
           MENU_ITEM_DUMMY();
         }
       }
+      MENU_ITEM(gcode, "Un-Mount card", PSTR("M22"));
+      MENU_ITEM(gcode, "Mount card", PSTR("M21"));
       END_MENU();
     }
 
@@ -3525,6 +3580,11 @@ char* ftostr52sp(const float& x) {
 }
 
 #endif // ULTRA_LCD
+
+
+
+
+
 
 
 
