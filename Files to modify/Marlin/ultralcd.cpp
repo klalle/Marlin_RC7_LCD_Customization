@@ -1790,7 +1790,7 @@ void kill_screen(const char* lcd_msg) {
     float rowHeight = u8g.getHeight() / (rows + 1); // 1/(rows+1) = 1/2 or 1/3
 
     uint8_t xStart = ColIndex*char_width-char_width+1;
-    uint8_t yStart = 3+12*RowIndex; //RowIndex*rowHeight + kHalfChar;
+    uint8_t yStart = 12*RowIndex; //RowIndex*rowHeight + kHalfChar;
   
     u8g.setPrintPos(xStart, yStart);
     lcd_print(text);
