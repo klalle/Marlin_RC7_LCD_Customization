@@ -172,6 +172,8 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
   static void menu_action_setting_edit_callback_float52(const char* pstr, float* ptr, float minValue, float maxValue, screenFunc_t callbackFunc);
   static void menu_action_setting_edit_callback_long5(const char* pstr, unsigned long* ptr, unsigned long minValue, unsigned long maxValue, screenFunc_t callbackFunc);
 
+  const char *Kalles_ftostr32(int lengthOfStr, char *str, const float& x);
+
   #if ENABLED(SDSUPPORT)
     static void lcd_sdcard_menu();
     static void menu_action_sdfile(const char* filename, char* longFilename);
@@ -1770,16 +1772,48 @@ void kill_screen(const char* lcd_msg) {
   static void lcd_pos_x() { SetCoordinateWithMultiplier(PSTR(MSG_MOVE_X), X_AXIS); }
   static void lcd_pos_y() { SetCoordinateWithMultiplier(PSTR(MSG_MOVE_Y), Y_AXIS); }
   static void lcd_pos_z() { SetCoordinateWithMultiplier(PSTR(MSG_MOVE_Z), Z_AXIS); }
+
+  static void PrintOnLCDKalle(int RowIndex, int ColIndex, const char* text=NULL){
+    uint8_t lcd_width = LCD_WIDTH - (START_COL);
+    uint8_t char_width = DOG_CHAR_WIDTH;
+    uint8_t vallen = lcd_strlen(text);
+  //3 list sen 12/rad varav 1 pad över/under
+    
+    //big font:
+    lcd_setFont(FONT_MENU_EDIT);
+    lcd_width = LCD_WIDTH_EDIT + 1;
+    char_width = DOG_CHAR_WIDTH_EDIT;
+      
+    //lcd_setFont(FONT_MENU);
+    uint8_t rows=5;
+    const float kHalfChar = (DOG_CHAR_HEIGHT_EDIT) / 2;
+    float rowHeight = u8g.getHeight() / (rows + 1); // 1/(rows+1) = 1/2 or 1/3
+
+    uint8_t xStart = ColIndex*char_width-char_width+1;
+    uint8_t yStart = 3+12*RowIndex; //RowIndex*rowHeight + kHalfChar;
+  
+    u8g.setPrintPos(xStart, yStart);
+    lcd_print(text);
+    
+    
+    
+  }
   
   static void lcd_SetCoodinatesAndMove(){
     //CurrentPos=0;
+    //const char label[15]; 
+    //sprintf(label, "X    %s","1234567/0");//ftostr32(X_Coordinate_Move));
     
     START_MENU();
     MENU_ITEM(back, "Back");
     
-    MENU_ITEM(submenu, "X", lcd_pos_x);
+    MENU_ITEM(submenu, "X", lcd_pos_x);//PSTR(Kalles_ftostr32(1,"X",X_Coordinate_Move)), lcd_pos_x);
     MENU_ITEM(submenu, "Y", lcd_pos_y);
     MENU_ITEM(submenu, "Z", lcd_pos_z);
+    
+    PrintOnLCDKalle(2,2,ftostr32(X_Coordinate_Move));//Write over line 2 (X)
+    PrintOnLCDKalle(3,2,ftostr32(Y_Coordinate_Move));
+    PrintOnLCDKalle(4,2,ftostr32(Z_Coordinate_Move));
     
     MENU_ITEM(function, "Execute move", MoveToCoordinates);
    
@@ -3380,7 +3414,27 @@ char *ftostr32(const float& x) {
   conv[6] = '\0';
   return conv;
 }
-
+const char *Kalles_ftostr32(int lengthOfStr, char *str, const float& x) {
+  char convK[20];
+  int i=0;
+  for(i=0;i<13;i++){
+    if(i<lengthOfStr){
+      convK[i]=str[i];
+    }else{
+      convK[i]=' ';
+    }
+  }
+  
+  long xx = abs(x * 100);
+  convK[i+0] = x >= 0 ? DIGIMOD(xx / 10000) : '-';
+  convK[i+1] = DIGIMOD(xx / 1000);
+  convK[i+2] = DIGIMOD(xx / 100);
+  convK[i+3] = '.';
+  convK[i+4] = DIGIMOD(xx / 10);
+  convK[i+5] = DIGIMOD(xx);
+  convK[i+6] = '\0';
+  return convK;
+}
 // Convert signed float to string (6 digit) with -1.234 / _0.000 / +1.234 format
 char* ftostr43sign(const float& x, char plus/*=' '*/) {
   long xx = x * 1000;
