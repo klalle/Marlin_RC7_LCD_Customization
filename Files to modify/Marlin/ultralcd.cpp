@@ -3625,7 +3625,7 @@ char* ftostr52sp(const float& x) {
       conv[3] = '.';
     }
     else {
-      conv[3] = conv[4] = ' '; 
+      conv[3] = conv[4] = ' ';
     }
     conv[5] = ' ';
   }
