@@ -1811,9 +1811,9 @@ void kill_screen(const char* lcd_msg) {
     MENU_ITEM(submenu, "Y", lcd_pos_y);
     MENU_ITEM(submenu, "Z", lcd_pos_z);
     
-    PrintOnLCDKalle(2,2,ftostr32(X_Coordinate_Move));//Write over line 2 (X)
-    PrintOnLCDKalle(3,2,ftostr32(Y_Coordinate_Move));
-    PrintOnLCDKalle(4,2,ftostr32(Z_Coordinate_Move));
+    PrintOnLCDKalle(2,3,ftostr32(X_Coordinate_Move));//Write over line 2 (X)
+    PrintOnLCDKalle(3,3,ftostr32(Y_Coordinate_Move));
+    PrintOnLCDKalle(4,3,ftostr32(Z_Coordinate_Move));
     
     MENU_ITEM(function, "Execute move", MoveToCoordinates);
    
