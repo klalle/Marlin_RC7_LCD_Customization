@@ -45,6 +45,8 @@ I was going crazy when trying to access the menu objects I needed through the LC
   * Control
     * acceleration, jerk, speeds.....
 
+#Read the "README.md"-file in the folder "Files to modify" for explanation on how to try it out yourselves!
+
 <b>Update 19/1-17:</b>
 * Added function to set coordinates first - then execute to go to set position
  * Is a bit buggy to wait while the machine moves while turning the knob if I know were I'm heading this is better!
