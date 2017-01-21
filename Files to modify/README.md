@@ -1,9 +1,9 @@
 #Here's how you do it:
 
-1. Download Marlin version [RC7_MPCNC_LCD_9916.zip](http://www.vicious1.com/wp-content/uploads/2015/12/RC7_MPCNC_LCD_9916.zip) from Vicious.
+1. Download Marlin version [RC7_MPCNC_LCD_9916.zip](http://www.vicious1.com/wp-content/uploads/2015/12/RC7_MPCNC_LCD_9916.zip) from Vicious. (or download from the folder called "Original files from Vicious")
 
 2. Download latest version of [U8glib x.xx (Arduino Environment)](https://code.google.com/archive/p/u8glib/downloads)
-  * Add to your Arduino library
+  * Add to your Arduino library (google howto)
 
 3. Unzip the "RC7_MPCNC_LCD_9916.zip"
 
@@ -21,5 +21,7 @@ All changes I've made are marked with //Kalle - open it up in Notepad++ and do a
 All menu-changes are done in "Marlin/ultralcd.cpp"
 
 The only change I've made in Marlin/Configuratio_adv.h is to set SD_FINISHED_STEPPERRELEASE to false to keep the steppers active after file is finnished.
+
+The file Cardreader.ino has been altered to change feedrate (speed%) back to 100% after file is finnished! 
 
 The Post processor is modified to not reset home (X0,Y0,Z0) at start of file, and to not insert M84 (Disable steppers) at the end of file.
