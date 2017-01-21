@@ -1711,16 +1711,16 @@ void kill_screen(const char* lcd_msg) {
     
     if(Z_Coordinate_Move>0){
       //Start with Z to move it (up) first...
-      sprintf(cmd, "G1 F300 Z%s\0",buffer_Z); // "\0"=end
+      sprintf(cmd, "G1 F200 Z%s\0",buffer_Z); // "\0"=end
       enqueue_and_echo_command(cmd); //execute 1st command
       
-      sprintf(cmd,"G1 F2000 X%s Y%s\0", buffer_X, buffer_Y);
+      sprintf(cmd,"G1 F1000 X%s Y%s\0", buffer_X, buffer_Y);
     
     }else{        
-      sprintf(cmd,"G1 F2000 X%s Y%s\0", buffer_X, buffer_Y);
+      sprintf(cmd,"G1 F1000 X%s Y%s\0", buffer_X, buffer_Y);
       enqueue_and_echo_command(cmd); //execute 1st command
       
-      sprintf(cmd, "G1 F300 Z%s\0",buffer_Z);
+      sprintf(cmd, "G1 F200 Z%s\0",buffer_Z);
     }
     //execute 2nd command
     enqueue_and_echo_command(cmd);
@@ -1813,11 +1813,11 @@ void kill_screen(const char* lcd_msg) {
 
     //If one of the X,Y or Z is currently selected => row is white => change text to black! 
     u8g.setColorIndex(0);  //  Black text on white (selected) background
-    if(encoderPosition / ENCODER_STEPS_PER_MENU_ITEM==2){
+    if(encoderPosition / ENCODER_STEPS_PER_MENU_ITEM==1){ //note that I've set the starting position on menu one step down allready!
       PrintOnLCDKalle(2,3,ftostr32(X_Coordinate_Move));
-    }else if(encoderPosition / ENCODER_STEPS_PER_MENU_ITEM==3){
+    }else if(encoderPosition / ENCODER_STEPS_PER_MENU_ITEM==2){
       PrintOnLCDKalle(3,3,ftostr32(Y_Coordinate_Move));
-    }else if(encoderPosition / ENCODER_STEPS_PER_MENU_ITEM==4){
+    }else if(encoderPosition / ENCODER_STEPS_PER_MENU_ITEM==3){
       PrintOnLCDKalle(4,3,ftostr32(Z_Coordinate_Move));
     }
     u8g.setColorIndex(1); // unmarked text
