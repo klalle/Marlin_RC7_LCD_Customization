@@ -1369,7 +1369,6 @@ void kill_screen(const char* lcd_msg) {
     -Print from SD
     -Go To Home (All/X/Y/Z)
     -Disable steppers
-		-Speed [%]
     -Temp Z offset
     -Z Homing offset 
     -Make this home
@@ -1387,7 +1386,7 @@ void kill_screen(const char* lcd_msg) {
     // ^ Main
     MENU_ITEM(back, MSG_MAIN);
   
-  //If something is still moving => show only Feedrate % and SD-card menu!
+  //If something is still moving => show only speed % and SD-card menu!
   if (planner.movesplanned() || IS_SD_PRINTING) {
 
     // Speed:
@@ -1419,8 +1418,7 @@ void kill_screen(const char* lcd_msg) {
     #endif //SDSUPPORT
     }
   else{ //The actual prepare menu
-		//reset speed%
-		feedrate_percentage=100;
+		
     // Move Axis
     MENU_ITEM(submenu2, MSG_MOVE_AXIS, lcd_move_menu);
     
@@ -1462,8 +1460,11 @@ void kill_screen(const char* lcd_msg) {
     //Set a temporary Z offset
     MENU_ITEM(submenu, "Temp Z offset", lcd_setZTempOffset_menu);
 
-    // Speed:
-    //MENU_ITEM_EDIT(int3, "Speed [%]", &feedrate_percentage, 10, 999);
+    
+    //reset speed% - When you're in this menu => you're not printing anything => reset the speed to 100%! - done in Cardreader.ino instead!
+    //feedrate_percentage=100;
+    // Or if you want to be able to access the speed-menu when not printing: 
+    MENU_ITEM_EDIT(int3, "Speed [%]", &feedrate_percentage, 10, 999);
     
     //Set Z-Homing offset (Height of probe bottom material) good idea to save to eeprom after this
     MENU_ITEM(submenu, "Z homing offset", lcd_setZProbeHeight_menu);
@@ -1690,46 +1691,44 @@ void kill_screen(const char* lcd_msg) {
     #endif
   #endif
   
-  //Kalle
+  //Kalle below are a couple of functions and menus to create the custom "Set Coordinates"-menu function that lets you set the coordinates befor executing the move!
   
   float X_Coordinate_Move;
   float Y_Coordinate_Move;
   float Z_Coordinate_Move;
-  
-  //För att lägga igop PSTR: MENU_ITEM(gcode, "X", PSTR("G1 F2000 X0"));
-    void MoveToCoordinates(){
-      
-      char buffer_X[15];
-      char buffer_Y[15];
-      char buffer_Z[15];
-      char cmd[30]; 
-      //char cmd2[30]; 
-      //char cmd3[30];
-      dtostrf(X_Coordinate_Move, 1, 2, buffer_X); //1=min width of string, 2=decimals
-      dtostrf(Y_Coordinate_Move, 1, 2, buffer_Y);
-      dtostrf(Z_Coordinate_Move, 1, 2, buffer_Z);
-      
-      if(Z_Coordinate_Move>0){
-        //Start with Z to move it (up) first...
-        sprintf(cmd, "G1 F300 Z%s\0",buffer_Z); // "\0"=end
-        enqueue_and_echo_command(cmd); //execute 1st command
-        
-        sprintf(cmd,"G1 F2000 X%s Y%s\0", buffer_X, buffer_Y);
-      
-      }else{        
-        sprintf(cmd,"G1 F2000 X%s Y%s\0", buffer_X, buffer_Y);
-        enqueue_and_echo_command(cmd); //execute 1st command
-        
-        sprintf(cmd, "G1 F300 Z%s\0",buffer_Z);
-      }
-      //execute 2nd command
-      enqueue_and_echo_command(cmd);
-      
+ 
+  void MoveToCoordinates(){
     
+    char buffer_X[15];
+    char buffer_Y[15];
+    char buffer_Z[15];
+    char cmd[30]; 
+    //char cmd2[30]; 
+    //char cmd3[30];
+    dtostrf(X_Coordinate_Move, 1, 2, buffer_X); //1=min width of string, 2=decimals
+    dtostrf(Y_Coordinate_Move, 1, 2, buffer_Y);
+    dtostrf(Z_Coordinate_Move, 1, 2, buffer_Z);
+    
+    if(Z_Coordinate_Move>0){
+      //Start with Z to move it (up) first...
+      sprintf(cmd, "G1 F300 Z%s\0",buffer_Z); // "\0"=end
+      enqueue_and_echo_command(cmd); //execute 1st command
+      
+      sprintf(cmd,"G1 F2000 X%s Y%s\0", buffer_X, buffer_Y);
+    
+    }else{        
+      sprintf(cmd,"G1 F2000 X%s Y%s\0", buffer_X, buffer_Y);
+      enqueue_and_echo_command(cmd); //execute 1st command
+      
+      sprintf(cmd, "G1 F300 Z%s\0",buffer_Z);
     }
+    //execute 2nd command
+    enqueue_and_echo_command(cmd);
+    
+  
+  }
 
-   // float CurrentPos;
-      //till skillnad från: enqueue_and_echo_commands_P(PSTR("M24"));
+   // Function to update the three variables that keeps track of your chosen coordinates (before you execute the actual move) increment/decrement 0.1, 1 or 10 at a time
   static void SetCoordinateWithMultiplier(const char* name, AxisEnum axis) {
     if (LCD_CLICKED) { 
 			lcd_goto_previous_menu(true); 
@@ -1740,9 +1739,9 @@ void kill_screen(const char* lcd_msg) {
     if (encoderPosition) {
       refresh_cmd_timeout();
       if(encoderPosition%ENCODER_STEPS_PER_MENU_ITEM==0){ //Kalle to make one knob-step equal one movescale!
-        float Addition = float((int32_t)encoderPosition) * move_menu_scale/ENCODER_STEPS_PER_MENU_ITEM;
+        float Addition = float((int32_t)encoderPosition) * move_menu_scale/ENCODER_STEPS_PER_MENU_ITEM;//Kalle ENCODER_STEPS_PER_MENU_ITEM=4
         if(axis == X_AXIS){
-          X_Coordinate_Move += Addition; //Kalle ENCODER_STEPS_PER_MENU_ITEM=4
+          X_Coordinate_Move += Addition; 
           //CurrentPos=X_Coordinate_Move;
         }else if(axis == Y_AXIS){
           Y_Coordinate_Move += Addition;
@@ -1768,23 +1767,24 @@ void kill_screen(const char* lcd_msg) {
     //}
   }
   
-  
+  //Help function to pass variables (not possible like this in Menu-item)
   static void lcd_pos_x() { SetCoordinateWithMultiplier(PSTR(MSG_MOVE_X), X_AXIS); }
   static void lcd_pos_y() { SetCoordinateWithMultiplier(PSTR(MSG_MOVE_Y), Y_AXIS); }
   static void lcd_pos_z() { SetCoordinateWithMultiplier(PSTR(MSG_MOVE_Z), Z_AXIS); }
 
+  //Function to owerwrite text on screen (used to add current choosen coordinates next to menu item X, Y and Z) like "X  2.23"
   static void PrintOnLCDKalle(int RowIndex, int ColIndex, const char* text=NULL){
-    uint8_t lcd_width = LCD_WIDTH - (START_COL);
-    uint8_t char_width = DOG_CHAR_WIDTH;
-    uint8_t vallen = lcd_strlen(text);
-  //3 list sen 12/rad varav 1 pad över/under
+    uint8_t lcd_width = LCD_WIDTH - (START_COL); //This turned out to be small text - overwritten bellow! 
+    uint8_t char_width = DOG_CHAR_WIDTH; //Small letters...
+    uint8_t vallen = lcd_strlen(text); //Not used...
+    //lcd_setFont(FONT_MENU);//Small letters...
     
-    //big font:
-    lcd_setFont(FONT_MENU_EDIT);
-    lcd_width = LCD_WIDTH_EDIT + 1;
-    char_width = DOG_CHAR_WIDTH_EDIT;
+    //Update settings for large font:
+    lcd_setFont(FONT_MENU_EDIT); //This is sent to ug8
+    lcd_width = LCD_WIDTH_EDIT + 1; //not used
+    char_width = DOG_CHAR_WIDTH_EDIT; //Used to calculate x-start 
       
-    //lcd_setFont(FONT_MENU);
+    
     uint8_t rows=5;
     const float kHalfChar = (DOG_CHAR_HEIGHT_EDIT) / 2;
     float rowHeight = u8g.getHeight() / (rows + 1); // 1/(rows+1) = 1/2 or 1/3
@@ -1794,26 +1794,33 @@ void kill_screen(const char* lcd_msg) {
   
     u8g.setPrintPos(xStart, yStart);
     lcd_print(text);
-    
-    
-    
+
   }
-  
+
+  //Custom menu to set coordinates before you move! 
   static void lcd_SetCoodinatesAndMove(){
-    //CurrentPos=0;
-    //const char label[15]; 
-    //sprintf(label, "X    %s","1234567/0");//ftostr32(X_Coordinate_Move));
     
     START_MENU();
     MENU_ITEM(back, "Back");
     
-    MENU_ITEM(submenu, "X", lcd_pos_x);//PSTR(Kalles_ftostr32(1,"X",X_Coordinate_Move)), lcd_pos_x);
+    MENU_ITEM(submenu, "X", lcd_pos_x);
     MENU_ITEM(submenu, "Y", lcd_pos_y);
     MENU_ITEM(submenu, "Z", lcd_pos_z);
     
-    PrintOnLCDKalle(2,3,ftostr32(X_Coordinate_Move));//Write over line 2 (X)
+    PrintOnLCDKalle(2,3,ftostr32(X_Coordinate_Move));//adds current choosen coordinate next to "X"-label like "X  23.24"
     PrintOnLCDKalle(3,3,ftostr32(Y_Coordinate_Move));
     PrintOnLCDKalle(4,3,ftostr32(Z_Coordinate_Move));
+
+    //If one of the X,Y or Z is currently selected => row is white => change text to black! 
+    u8g.setColorIndex(0);  //  Black text on white (selected) background
+    if(encoderPosition / ENCODER_STEPS_PER_MENU_ITEM==2){
+      PrintOnLCDKalle(2,3,ftostr32(X_Coordinate_Move));
+    }else if(encoderPosition / ENCODER_STEPS_PER_MENU_ITEM==3){
+      PrintOnLCDKalle(3,3,ftostr32(Y_Coordinate_Move));
+    }else if(encoderPosition / ENCODER_STEPS_PER_MENU_ITEM==4){
+      PrintOnLCDKalle(4,3,ftostr32(Z_Coordinate_Move));
+    }
+    u8g.setColorIndex(1); // unmarked text
     
     MENU_ITEM(function, "Execute move", MoveToCoordinates);
    
@@ -1833,6 +1840,7 @@ void kill_screen(const char* lcd_msg) {
   #endif
 
   static void _lcd_move_menu_axis() {
+    //Reset "move to coordinates" to current position!
     X_Coordinate_Move = current_position[X_AXIS];
     Y_Coordinate_Move = current_position[Y_AXIS];
     Z_Coordinate_Move = current_position[Z_AXIS];
@@ -1840,15 +1848,16 @@ void kill_screen(const char* lcd_msg) {
     
     START_MENU();
     MENU_ITEM(back, MSG_MOVE_AXIS);
-    MENU_ITEM(submenu, "Set coordinates", lcd_SetCoodinatesAndMove);
+    //Custom menu function: 
+    MENU_ITEM(submenu, "Set coordinates", lcd_SetCoodinatesAndMove); //Kalle
+    
     if (_MOVE_XYZ_ALLOWED) {
       if (move_menu_scale < 10.0) { // Since i use z-move the most - it'n now moved to top Kalle
         if (_MOVE_XYZ_ALLOWED) MENU_ITEM(submenu, "Move Z", lcd_move_z);
       }
       MENU_ITEM(submenu, "Move X", lcd_move_x);
       MENU_ITEM(submenu, "Move Y", lcd_move_y);
-      
-      //MENU_ITEM(submenu, "Move to Xx", lcd_move_y); //Kalle Set coordinate - then move!
+     
     }
 
     
