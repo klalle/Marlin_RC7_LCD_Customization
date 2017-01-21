@@ -37,6 +37,7 @@ I was going crazy when trying to access the menu objects I needed through the LC
     * All/X/Y/Z
   * Disable steppers
   * Temp Z offset
+  * Speed [%]
   * Z Homing offset 
   * Make this home
   * Store to EEPROM
