@@ -1206,7 +1206,8 @@ void kill_screen(const char* lcd_msg) {
         enqueue_and_echo_commands_P(PSTR("M84 S1800")); 
         
         //Move z up after homing
-        enqueue_and_echo_commands_P(PSTR("G1 F300 Z5 X0 Y0")); //Activate all steppers! 
+        enqueue_and_echo_commands_P(PSTR("G1 F300 Z5 X0.1 Y0.1")); //Activate all steppers! 
+        enqueue_and_echo_commands_P(PSTR("G1 F300 X0 Y0")); //Return to 0 
         
         //Tell Marlin that we know where all axis are
         axis_known_position[Z_AXIS] = true; //Otherwise they'll blink
@@ -1220,8 +1221,8 @@ void kill_screen(const char* lcd_msg) {
         lcd_return_to_status();
       
     }else{
-    
-      lcd_goto_previous_menu(); 
+      lcd_goto_previous_menu(true); 
+      //lcd_goto_previous_menu(); 
     }
     return; 
     }
