@@ -2824,7 +2824,7 @@ void kill_screen(const char* lcd_msg) {
     MENU_ITEM(back,"CANCEL");
     MENU_ITEM(function,"RUN",FileConfirmedToRun);
     u8g.setColorIndex(1); 
-    PrintOnLCDKalle(4,1,SelLongFilename);
+    PrintOnLCDKalle(4,1,SelLongFilename); //This function let me print anywhare on screen (over writing menu text if I want to)
     
     END_MENU();
     
