@@ -62,5 +62,5 @@ I was going crazy when trying to access the menu objects I needed through the LC
 * Made the gcode return to X0 and Y0 after finnished file in post-processor 
  * if something fuckes up during e.g. SD-card swap it's good to know we're at X0Y0 -just probe for Z again! 
  
- <b> Update 22/1 </b>
- * Implimented a confirmation step before a file is started (the pot-knob is a bit flaky..)
+<b> Update 22/1 </b>
+* Implimented a confirmation step before a file is started (the pot-knob is a bit flaky..)
