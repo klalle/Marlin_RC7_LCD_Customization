@@ -1201,9 +1201,12 @@ void kill_screen(const char* lcd_msg) {
         }
         //Home Z
         enqueue_and_echo_commands_P(PSTR("G28 Z"));
-    
+
+        //Stepper timeout after 30min so they wont turn off
+        enqueue_and_echo_commands_P(PSTR("M84 S1800")); 
+        
         //Move z up after homing
-        enqueue_and_echo_commands_P(PSTR("G1 F300 Z5"));
+        enqueue_and_echo_commands_P(PSTR("G1 F300 Z5 X0 Y0")); //Activate all steppers! 
         
         //Tell Marlin that we know where all axis are
         axis_known_position[Z_AXIS] = true; //Otherwise they'll blink
