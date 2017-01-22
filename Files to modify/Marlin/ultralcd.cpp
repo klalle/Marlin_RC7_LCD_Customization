@@ -173,7 +173,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
   static void menu_action_setting_edit_callback_long5(const char* pstr, unsigned long* ptr, unsigned long minValue, unsigned long maxValue, screenFunc_t callbackFunc);
 
   const char *Kalles_ftostr32(int lengthOfStr, char *str, const float& x);
-
+  static void PrintOnLCDKalle(int RowIndex, int ColIndex, const char* text=NULL); //Custom function to over write something
   #if ENABLED(SDSUPPORT)
     static void lcd_sdcard_menu();
     static void menu_action_sdfile(const char* filename, char* longFilename);
@@ -1418,7 +1418,7 @@ void kill_screen(const char* lcd_msg) {
     #endif //SDSUPPORT
     }
   else{ //The actual prepare menu
-		
+    
     // Move Axis
     MENU_ITEM(submenu2, MSG_MOVE_AXIS, lcd_move_menu);
     
@@ -1731,9 +1731,9 @@ void kill_screen(const char* lcd_msg) {
    // Function to update the three variables that keeps track of your chosen coordinates (before you execute the actual move) increment/decrement 0.1, 1 or 10 at a time
   static void SetCoordinateWithMultiplier(const char* name, AxisEnum axis) {
     if (LCD_CLICKED) { 
-			lcd_goto_previous_menu(true); 
-			return; 
-		}
+      lcd_goto_previous_menu(true); 
+      return; 
+    }
     ENCODER_DIRECTION_NORMAL();
     
     if (encoderPosition) {
@@ -2812,12 +2812,38 @@ void kill_screen(const char* lcd_msg) {
   static void menu_action_gcode(const char* pgcode) { enqueue_and_echo_commands_P(pgcode); }
   static void menu_action_function(screenFunc_t func) { (*func)(); }
 
+  const char* Selectedfilename;
+  const char *SelLongFilename;
+  static void FileConfirmedToRun(){ //Kalle
+    //UNUSED(longFilename);
+    card.openAndPrintFile(Selectedfilename);
+    lcd_return_to_status();
+  }
+  static void confirmRunFile(){
+    START_MENU();
+    MENU_ITEM(back,"CANCEL");
+    MENU_ITEM(function,"RUN",FileConfirmedToRun);
+    u8g.setColorIndex(1); 
+    PrintOnLCDKalle(4,1,SelLongFilename);
+    
+    END_MENU();
+    
+  }
   #if ENABLED(SDSUPPORT)
 
     static void menu_action_sdfile(const char* filename, char* longFilename) {
-      UNUSED(longFilename);
-      card.openAndPrintFile(filename);
-      lcd_return_to_status();
+      //lcd_AutoHome_menu(false);
+      Selectedfilename = filename;
+      SelLongFilename = longFilename;
+      lcd_goto_screen(confirmRunFile);//
+      
+      /*START_MENU();
+      MENU_ITEM(back,"CANCEL");
+      MENU_ITEM(function,"RUN",confirmRunFile);
+      END_MENU();
+      UNUSED(longFilename);*/
+      /*card.openAndPrintFile(filename);
+      lcd_return_to_status();*/
     }
 
     static void menu_action_sddirectory(const char* filename, char* longFilename) {
@@ -3643,13 +3669,4 @@ char* ftostr52sp(const float& x) {
 }
 
 #endif // ULTRA_LCD
-
-
-
-
-
-
-
-
-
 
