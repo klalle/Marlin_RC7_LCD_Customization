@@ -8,6 +8,8 @@ I was going crazy when trying to access the menu objects I needed through the LC
 ####This is what I aimed for:<br>
 * Get rid of all junk I don’t use (I’m only using the machine as a CNC-router)
 * Reorder the menu to put the mostly used commands on top
+* Confirm run function
+  * The pot-knob is a bit flaky => I dont want to accedently start to run the wrong file 
 * Access the z-probe offset from the LCD-menu
   * The height of the piece of metal I let the tool go down against to probe for z (connected to GND and z-min)
 * Make a temporary Z-offset-menu item
@@ -33,6 +35,7 @@ I was going crazy when trying to access the menu objects I needed through the LC
     * Zero All
   * Print from SD
     * bla bla bla 
+    * Confirmation before it starts to run a file!
   * Go To Home
     * All/X/Y/Z
   * Disable steppers
@@ -58,3 +61,6 @@ I was going crazy when trying to access the menu objects I needed through the LC
  * so I dont have to restart when changing the SD-card
 * Made the gcode return to X0 and Y0 after finnished file in post-processor 
  * if something fuckes up during e.g. SD-card swap it's good to know we're at X0Y0 -just probe for Z again! 
+ 
+ <b> Update 22/1 </b>
+ * Implimented a confirmation step before a file is started (the pot-knob is a bit flaky..)
