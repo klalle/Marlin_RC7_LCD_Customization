@@ -1,6 +1,6 @@
 #Here's how you do it:
 
-1. Download Marlin version [RC7_MPCNC_LCD_9916.zip](http://www.vicious1.com/wp-content/uploads/2015/12/RC7_MPCNC_LCD_9916.zip) from Vicious. (or download from the folder called "Original files from Vicious")
+1. Download Marlin version [RC7_MPCNC_LCD_9916.zip](http://www.vicious1.com/wp-content/uploads/2015/12/RC7_MPCNC_LCD_9916.zip) from Vicious. (or download from my folder [Original files from Vicious](https://github.com/klalle/Marlin_RC7_LCD_Customization/tree/master/Origial%20files%20from%20Vicious))
 
 2. Download latest version of [U8glib x.xx (Arduino Environment)](https://code.google.com/archive/p/u8glib/downloads)
   * Add to your Arduino library (google howto)
