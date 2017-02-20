@@ -172,7 +172,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
   static void menu_action_setting_edit_callback_float52(const char* pstr, float* ptr, float minValue, float maxValue, screenFunc_t callbackFunc);
   static void menu_action_setting_edit_callback_long5(const char* pstr, unsigned long* ptr, unsigned long minValue, unsigned long maxValue, screenFunc_t callbackFunc);
 
-  const char *Kalles_ftostr32(int lengthOfStr, char *str, const float& x);
+  char *Kalles_ftostr32(int lengthOfStr, char *str, const float& x);
   static void PrintOnLCDKalle(int RowIndex, int ColIndex, const char* text=NULL); //Custom function to over write something
   #if ENABLED(SDSUPPORT)
     static void lcd_sdcard_menu();
@@ -1777,7 +1777,7 @@ void kill_screen(const char* lcd_msg) {
   static void lcd_pos_z() { SetCoordinateWithMultiplier(PSTR(MSG_MOVE_Z), Z_AXIS); }
 
   //Function to owerwrite text on screen (used to add current choosen coordinates next to menu item X, Y and Z) like "X  2.23"
-  static void PrintOnLCDKalle(int RowIndex, int ColIndex, const char* text=NULL){
+  static void PrintOnLCDKalle(int RowIndex, int ColIndex, const char* text){
     uint8_t lcd_width = LCD_WIDTH - (START_COL); //This turned out to be small text - overwritten bellow! 
     uint8_t char_width = DOG_CHAR_WIDTH; //Small letters...
     uint8_t vallen = lcd_strlen(text); //Not used...
@@ -3453,7 +3453,7 @@ char *ftostr32(const float& x) {
   conv[6] = '\0';
   return conv;
 }
-const char *Kalles_ftostr32(int lengthOfStr, char *str, const float& x) {
+char *Kalles_ftostr32(int lengthOfStr, char *str, const float& x) {
   char convK[20];
   int i=0;
   for(i=0;i<13;i++){
