@@ -172,7 +172,7 @@ uint8_t lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; // Set when the LCD needs to 
   static void menu_action_setting_edit_callback_float52(const char* pstr, float* ptr, float minValue, float maxValue, screenFunc_t callbackFunc);
   static void menu_action_setting_edit_callback_long5(const char* pstr, unsigned long* ptr, unsigned long minValue, unsigned long maxValue, screenFunc_t callbackFunc);
 
-  char *Kalles_ftostr32(int lengthOfStr, char *str, const float& x);
+ // char *Kalles_ftostr32(int lengthOfStr, char *str, const float& x);
   static void PrintOnLCDKalle(int RowIndex, int ColIndex, const char* text=NULL); //Custom function to over write something
   #if ENABLED(SDSUPPORT)
     static void lcd_sdcard_menu();
@@ -3453,7 +3453,7 @@ char *ftostr32(const float& x) {
   conv[6] = '\0';
   return conv;
 }
-char *Kalles_ftostr32(int lengthOfStr, char *str, const float& x) {
+/*char *Kalles_ftostr32(int lengthOfStr, char *str, const float& x) {
   char convK[20];
   int i=0;
   for(i=0;i<13;i++){
@@ -3473,7 +3473,7 @@ char *Kalles_ftostr32(int lengthOfStr, char *str, const float& x) {
   convK[i+5] = DIGIMOD(xx);
   convK[i+6] = '\0';
   return convK;
-}
+}*/
 // Convert signed float to string (6 digit) with -1.234 / _0.000 / +1.234 format
 char* ftostr43sign(const float& x, char plus/*=' '*/) {
   long xx = x * 1000;
