@@ -1345,42 +1345,42 @@ void kill_screen(const char* lcd_msg) {
     
    
    }
-	 static void lcd_GoToHome_menu() {
+   static void lcd_GoToHome_menu() {
     START_MENU();
     MENU_ITEM(back, MSG_MAIN);
     
-    MENU_ITEM(function, "ALL", PSTR("G28"))); //All
+    MENU_ITEM(function, "ALL", HomeAll); //All
     MENU_ITEM(gcode, "X", PSTR("G1 F2000 X0"));
     MENU_ITEM(gcode, "Y", PSTR("G1 F2000 Y0"));
     MENU_ITEM(gcode, "Z", PSTR("G1 F300 Z0"));
 
     END_MENU();
   }
-	
+  
  static void lcd_SetXYHome_menu() {
     START_MENU();
     MENU_ITEM(back, MSG_MAIN);
     
-    MENU_ITEM(function, "X and Y", PSTR("G28 X Y"))); //All (not Z)
+    MENU_ITEM(gcode, "X and Y", PSTR("G28 X Y")); //All (not Z)
     MENU_ITEM(gcode, "X", PSTR("G28 X"));
     MENU_ITEM(gcode, "Y", PSTR("G28 Y"));
 
     END_MENU();
   }
-	
+  
   static void lcd_SetHome_menu() {
     START_MENU();
     MENU_ITEM(back, MSG_MAIN);
 
-		//Home Z (and set x&y=0)
+    //Home Z (and set x&y=0)
     MENU_ITEM(submenu2, "Z0 (Probe)", lcd_AutoHomeZ_menu); 
-		
+    
     //Home-menu
     MENU_ITEM(submenu2, "X0 Y0 (Endstops)", lcd_SetXYHome_menu);
-		
-		//Set current position to home
+    
+    //Set current position to home
     MENU_ITEM(gcode, "Make this home", PSTR("G92 X0 Y0 Z0"));
-		
+    
     END_MENU();
   }
   
@@ -1453,12 +1453,12 @@ void kill_screen(const char* lcd_msg) {
     // Move Axis
     MENU_ITEM(submenu2, MSG_MOVE_AXIS, lcd_move_menu);
     
-		//Home-menu
+    //Home-menu
     MENU_ITEM(submenu2, "Set Home", lcd_SetHome_menu);
-		
-		//Home-menu
+    
+    //Home-menu
     MENU_ITEM(submenu2, "Go To Home", lcd_GoToHome_menu);
-		
+    
     //SD-card: 
     #if ENABLED(SDSUPPORT)
       if (card.cardOK) {
@@ -1493,7 +1493,7 @@ void kill_screen(const char* lcd_msg) {
     //Set a temporary Z offset
     MENU_ITEM(submenu, "Temp Z offset", lcd_setZTempOffset_menu);
 
-		//Set Z-Homing offset (Height of probe bottom material) good idea to save to eeprom after this
+    //Set Z-Homing offset (Height of probe bottom material) good idea to save to eeprom after this
     MENU_ITEM(submenu, "Z homing offset", lcd_setZProbeHeight_menu);
     
     //reset speed% - When you're in this menu => you're not printing anything => reset the speed to 100%! - done in Cardreader.ino instead!
@@ -3698,4 +3698,3 @@ char* ftostr52sp(const float& x) {
 }
 
 #endif // ULTRA_LCD
-
