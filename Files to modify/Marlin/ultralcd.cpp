@@ -1371,8 +1371,6 @@ void kill_screen(const char* lcd_msg) {
   static void lcd_SetHome_menu() {
     START_MENU();
     MENU_ITEM(back, MSG_MAIN);
-    
-    MENU_ITEM(gcode, "X", PSTR("G1 F2000 X0"));
 
 		//Home Z (and set x&y=0)
     MENU_ITEM(submenu2, "Z0 (Probe)", lcd_AutoHomeZ_menu); 
