@@ -1372,6 +1372,8 @@ void kill_screen(const char* lcd_msg) {
     START_MENU();
     MENU_ITEM(back, MSG_MAIN);
 
+    MENU_ITEM(gcode, "Z0 (Here)", PSTR("G92 Z0")); 
+    
     //Home Z (and set x&y=0)
     MENU_ITEM(submenu2, "Z0 (Probe)", lcd_AutoHomeZ_menu); 
     
@@ -3698,3 +3700,4 @@ char* ftostr52sp(const float& x) {
 }
 
 #endif // ULTRA_LCD
+
